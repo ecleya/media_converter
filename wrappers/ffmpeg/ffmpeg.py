@@ -1,4 +1,3 @@
-import os
 import importlib
 
 from chardet.universaldetector import UniversalDetector

@@ -7,7 +7,7 @@ import unicodedata
 from time import time
 from datetime import datetime
 
-from utils import processutil, logutil
+from utils import logutil
 
 
 def files_in(target_folder, recursive=False):
