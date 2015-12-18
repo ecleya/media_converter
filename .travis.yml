@@ -1,0 +1,10 @@
+language: python
+
+python:
+  - '3.4.3'
+
+install:
+  - pip install -i requirements.txt
+
+script:
+  - py.test
