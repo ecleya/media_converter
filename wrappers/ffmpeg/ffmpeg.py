@@ -27,11 +27,11 @@ class FFmpeg:
         return getattr(module, '%sFFmpegCodec' % codec_name.replace('_', '').upper())
 
     @staticmethod
-    def change_container(src, dst):
-        if not os.path.exists(os.path.split(dst)[0]):
-            fileutil.makedirs(os.path.split(dst)[0])
-
+    def change_container(src, container):
+        dst = fileutil.generate_temporary_file_path(container.extension)
         processutil.call(['/usr/local/bin/ffmpeg', '-y', '-i', src, '-map', '0', '-c', 'copy', dst])
+
+        return dst
 
     @staticmethod
     def get_mean_volume(src):
