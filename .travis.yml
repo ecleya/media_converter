@@ -4,7 +4,7 @@ python:
   - '3.4.3'
 
 install:
-  - pip install -i requirements.txt
+  - pip install -r requirements.txt
 
 script:
   - py.test
