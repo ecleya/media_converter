@@ -1,9 +1,9 @@
 import importlib
 
 from chardet.universaldetector import UniversalDetector
+from media_converter.utils import fileutil, processutil
 
-from utils import fileutil, processutil
-from wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
+from media_converter.wrappers.ffmpeg import AudioOutstream, VideoOutstream
 
 
 class FFmpeg:

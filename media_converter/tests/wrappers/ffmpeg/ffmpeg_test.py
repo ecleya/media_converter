@@ -1,6 +1,8 @@
 import unittest
-from models.medium import Container
-from wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream, VideoInstream, AudioInstream, SubtitleInstream
+
+from media_converter.wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream, VideoInstream, AudioInstream, SubtitleInstream
+
+from media_converter.models.medium import Container
 
 
 class TestFFmpeg(unittest.TestCase):

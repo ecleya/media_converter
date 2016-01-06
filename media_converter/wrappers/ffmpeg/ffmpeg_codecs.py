@@ -1,4 +1,4 @@
-from wrappers.codec import H264, AAC, ALAC, PCMS16LE, MPEG2, MP2, AC3, EAC3
+from media_converter.wrappers import H264, AAC, ALAC, PCMS16LE, MPEG2, MP2, AC3, EAC3
 
 
 class FFmpegCodecMixin:

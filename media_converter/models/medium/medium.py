@@ -1,7 +1,8 @@
 from fractions import Fraction
-from utils import processutil
-from wrappers import mediainfo
 from xml.etree import ElementTree
+
+from media_converter.utils import processutil
+from media_converter.wrappers import mediainfo
 
 
 class Medium:
