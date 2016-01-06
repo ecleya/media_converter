@@ -1,4 +1,4 @@
-from media_converter.models import Medium
+from media_converter.models.medium import Medium
 
 from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfile
 

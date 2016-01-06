@@ -3,7 +3,7 @@ import importlib
 from chardet.universaldetector import UniversalDetector
 from media_converter.utils import fileutil, processutil
 
-from media_converter.wrappers.ffmpeg import AudioOutstream, VideoOutstream
+from media_converter.wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
 
 
 class FFmpeg:
@@ -22,7 +22,7 @@ class FFmpeg:
 
     @staticmethod
     def get_ffmpeg_codec_by_name(codec_name):
-        module = importlib.import_module('wrappers.ffmpeg.ffmpeg_codecs')
+        module = importlib.import_module('media_converter.wrappers.ffmpeg.ffmpeg_codecs')
         return getattr(module, '%sFFmpegCodec' % codec_name.replace('_', '').upper())
 
     @staticmethod
@@ -148,7 +148,7 @@ class FFmpeg:
             options = []
             idx = 0
             for effect in outstream.effects:
-                module = importlib.import_module('wrappers.ffmpeg.ffmpeg_filters')
+                module = importlib.import_module('media_converter.wrappers.ffmpeg.ffmpeg_filters')
                 stream_specifier = self._get_stream_specifier(effect['instream'])
                 if stream_specifier is not None:
                     effect['args']['stream_specifier'] = stream_specifier

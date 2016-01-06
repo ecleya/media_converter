@@ -7,7 +7,7 @@ class Codec:
 
     @staticmethod
     def get_codec_by_name(codec_name):
-        module = importlib.import_module('wrappers.codec')
+        module = importlib.import_module('media_converter.wrappers.codec')
         return getattr(module, codec_name.upper())
 
     def is_video_codec(self):

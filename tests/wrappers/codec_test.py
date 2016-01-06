@@ -9,4 +9,3 @@ class TestFFmpeg(unittest.TestCase):
         h264_codec = Codec.get_codec_by_name('H264')
 
         self.assertTrue(h264_codec is H264)
-
