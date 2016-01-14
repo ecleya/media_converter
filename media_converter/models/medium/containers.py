@@ -34,7 +34,7 @@ class _Movie(_ContainerBase):
         return '.mov'
 
 
-class _Flash(_ContainerBase):
+class _FlashVideo(_ContainerBase):
     @property
     def extension(self):
         return '.flv'
@@ -46,3 +46,4 @@ class Container:
     MATROSKA = _Matroska()
     MP4 = _MP4()
     MOVIE = _Movie()
+    FLASH_VIDEO = _FlashVideo()

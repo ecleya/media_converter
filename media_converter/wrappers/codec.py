@@ -83,6 +83,11 @@ class ALAC(LosslessAudioCodec):
         LosslessAudioCodec.__init__(self, channels, sampling_rate)
 
 
+class FLAC(LosslessAudioCodec):
+    def __init__(self, channels=None, sampling_rate=None):
+        LosslessAudioCodec.__init__(self, channels, sampling_rate)
+
+
 class PCMS16LE(LosslessAudioCodec):
     def __init__(self, channels=None, sampling_rate=None):
         LosslessAudioCodec.__init__(self, channels, sampling_rate)
