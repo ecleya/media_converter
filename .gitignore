@@ -1,2 +1,11 @@
 
 .coverage
+
+.cache
+
+build
+
+dist
+
+media_converter.egg-info
+
