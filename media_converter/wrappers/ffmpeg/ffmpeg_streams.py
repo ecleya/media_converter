@@ -96,7 +96,7 @@ class VideoOutstream(FFmpegOutstream):
         if type(instream) is str:
             instream = FFmpegInfile(instream)
 
-        if type(instream) is FFmpegInfile:
+        if isinstance(instream, FFmpegInfile):
             instream = FFmpegInstream(instream, 'v', 0)
 
         FFmpegOutstream.__init__(self, instream, 'v', target_codec)

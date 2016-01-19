@@ -1,6 +1,7 @@
 import unittest
 
 from media_converter.wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream, VideoInstream, AudioInstream, SubtitleInstream
+from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfileImageSequence
 
 from media_converter.models.medium import Container
 
@@ -117,4 +118,22 @@ class TestFFmpeg(unittest.TestCase):
                           '-filter_complex', "[0:v][1:v:0]overlay=0:0[vf0_out]",
                           '-map', '[vf0_out]', '-c:v', 'h264', '-crf', '13.0', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.0',
                           '-map', '0:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
+                          '-threads', '0'])
+
+    def test_make_video_from_image_sequence(self):
+        sequence_pattern = 'vid-%09d.png'
+        frame_rate_of_images = 30
+        audio_in = 'a.flac'
+        video_codec = FFmpeg.get_ffmpeg_codec_by_name('mpeg2')()
+        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('flac')(channels=2, sampling_rate=48000)
+
+        video_outstream = VideoOutstream(FFmpegInfileImageSequence(sequence_pattern, frame_rate=frame_rate_of_images), video_codec)
+        audio_outstream = AudioOutstream(audio_in, audio_codec)
+
+        ffmpeg = FFmpeg([video_outstream, audio_outstream], Container.MATROSKA)
+        self.assertEqual(ffmpeg.command[:-1],
+                         ['/usr/local/bin/ffmpeg', '-y', '-r', str(frame_rate_of_images), '-vsync', '1', '-f', 'image2', '-i', sequence_pattern,
+                          '-i', audio_in,
+                          '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '10000k',
+                          '-map', '1:a:0', '-c:a:0', 'flac', '-ac:a:0', '2', '-ar:a:0', '48000',
                           '-threads', '0'])
