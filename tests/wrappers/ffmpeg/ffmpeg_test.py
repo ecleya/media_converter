@@ -1,6 +1,7 @@
 import unittest
 
 from media_converter.wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream, VideoInstream, AudioInstream, SubtitleInstream
+from media_converter.wrappers.ffmpeg.ffmpeg_codecs import VideoCodecs, AudioCodecs
 from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfileImageSequence
 
 from media_converter.models.medium import Container
@@ -9,8 +10,8 @@ from media_converter.models.medium import Container
 class TestFFmpeg(unittest.TestCase):
     def test_transcode_to_lossless_format(self):
         src = 'dummy.mp4'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')(quantization_parameter=0)
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('alac')()
+        video_codec = VideoCodecs.H264(quantization_parameter=0)
+        audio_codec = AudioCodecs.ALAC()
 
         video_outstream = VideoOutstream(src, video_codec)
         audio_outstream = AudioOutstream(src, audio_codec)
@@ -23,8 +24,8 @@ class TestFFmpeg(unittest.TestCase):
 
     def test_mix_track(self):
         srcs = ['a.m4v', 'b.m4v']
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')()
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('aac')(bitrate='256k', channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.H264()
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(srcs[0], video_codec)
         audio_outstream = AudioOutstream(srcs[1], audio_codec)
@@ -38,8 +39,8 @@ class TestFFmpeg(unittest.TestCase):
 
     def test_analyze_duration_and_probe_size(self):
         src = 'dummy.mp4'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')()
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('alac')()
+        video_codec = VideoCodecs.H264()
+        audio_codec = AudioCodecs.ALAC()
 
         video_outstream = VideoOutstream(src, video_codec)
         audio_outstream = AudioOutstream(src, audio_codec)
@@ -52,8 +53,8 @@ class TestFFmpeg(unittest.TestCase):
 
     def test_multiple_audio_track(self):
         src = 'a.m4v'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')()
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('aac')(bitrate='256k', channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.H264()
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(src, video_codec)
         audio_outstream1 = AudioOutstream(AudioInstream(src, 0), audio_codec)
@@ -69,8 +70,8 @@ class TestFFmpeg(unittest.TestCase):
 
     def test_hardburn_image_subtitle(self):
         src = 'a.mkv'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')(constant_rate_factor=13.0)
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('aac')(bitrate='256k', channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.H264(constant_rate_factor=13.0)
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(src, video_codec)
         video_outstream.add_overlay(SubtitleInstream(src))
@@ -87,8 +88,8 @@ class TestFFmpeg(unittest.TestCase):
     def test_hardburn_text_subtitle(self):
         src = 'a.mkv'
         subtitle_path = 'b.srt'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')(constant_rate_factor=13.0)
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('aac')(bitrate='256k', channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.H264(constant_rate_factor=13.0)
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(src, video_codec)
         video_outstream.add_subtitle(subtitle_path)
@@ -105,8 +106,8 @@ class TestFFmpeg(unittest.TestCase):
     def test_overlay_watermark_image(self):
         video_in = 'a.mkv'
         image_in = 'a.png'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('h264')(constant_rate_factor=13.0)
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('aac')(bitrate='256k', channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.H264(constant_rate_factor=13.0)
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(video_in, video_codec)
         video_outstream.add_overlay(VideoInstream(image_in))
@@ -115,7 +116,7 @@ class TestFFmpeg(unittest.TestCase):
         ffmpeg = FFmpeg([video_outstream, audio_outstream], Container.M4V)
         self.assertEqual(ffmpeg.command[:-1],
                          ['/usr/local/bin/ffmpeg', '-y', '-i', video_in, '-i', image_in,
-                          '-filter_complex', "[0:v][1:v:0]overlay=0:0[vf0_out]",
+                          '-filter_complex', '[0:v][1:v:0]overlay=0:0[vf0_out]',
                           '-map', '[vf0_out]', '-c:v', 'h264', '-crf', '13.0', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.0',
                           '-map', '0:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
                           '-threads', '0'])
@@ -124,8 +125,8 @@ class TestFFmpeg(unittest.TestCase):
         sequence_pattern = 'vid-%09d.png'
         frame_rate_of_images = 30
         audio_in = 'a.flac'
-        video_codec = FFmpeg.get_ffmpeg_codec_by_name('mpeg2')()
-        audio_codec = FFmpeg.get_ffmpeg_codec_by_name('flac')(channels=2, sampling_rate=48000)
+        video_codec = VideoCodecs.MPEG2()
+        audio_codec = AudioCodecs.FLAC(channels=2, sampling_rate=48000)
 
         video_outstream = VideoOutstream(FFmpegInfileImageSequence(sequence_pattern, frame_rate=frame_rate_of_images), video_codec)
         audio_outstream = AudioOutstream(audio_in, audio_codec)
@@ -136,4 +137,21 @@ class TestFFmpeg(unittest.TestCase):
                           '-i', audio_in,
                           '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '10000k',
                           '-map', '1:a:0', '-c:a:0', 'flac', '-ac:a:0', '2', '-ar:a:0', '48000',
+                          '-threads', '0'])
+
+    def test_video_presentation_timestamp(self):
+        src = 'a.mkv'
+        video_codec = VideoCodecs.H264(constant_rate_factor=13.0)
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
+
+        video_outstream = VideoOutstream(src, video_codec)
+        video_outstream.add_presentation_timestamp(0.5)
+        audio_outstream = AudioOutstream(src, audio_codec)
+
+        ffmpeg = FFmpeg([video_outstream, audio_outstream], Container.MATROSKA)
+        self.assertEqual(ffmpeg.command[:-1],
+                         ['/usr/local/bin/ffmpeg', '-y', '-i', src,
+                          '-filter_complex', '[0:v]setpts=0.5*PTS[vf0_out]',
+                          '-map', '[vf0_out]', '-c:v', 'h264', '-crf', '13.0', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.0',
+                          '-map', '0:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
                           '-threads', '0'])

@@ -97,6 +97,7 @@ class MP2(AudioCodec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
+
 class SRT(SubtitleCodec):
     def __init__(self):
         super(SRT, self).__init__()

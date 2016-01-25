@@ -5,6 +5,9 @@ from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfile
 
 class FFmpegInstream:
     def __init__(self, infile, stream_type, stream_index):
+        if type(infile) is str:
+            infile = FFmpegInfile(infile)
+
         self._infile = infile
         self._stream_type = stream_type
         self._stream_index = stream_index
@@ -24,11 +27,8 @@ class FFmpegInstream:
 
 class VideoInstream(FFmpegInstream):
     def __init__(self, infile, stream_index=0):
-        if type(infile) is str:
-            infile = FFmpegInfile(infile)
-
         FFmpegInstream.__init__(self, infile, 'v', stream_index)
-        self._medium = Medium(infile.infile_path)
+        self._medium = Medium(self.infile.infile_path)
 
     @property
     def width(self):
@@ -41,11 +41,8 @@ class VideoInstream(FFmpegInstream):
 
 class AudioInstream(FFmpegInstream):
     def __init__(self, infile, stream_index=0):
-        if type(infile) is str:
-            infile = FFmpegInfile(infile)
-
         FFmpegInstream.__init__(self, infile, 'a', stream_index)
-        self._medium = Medium(infile.infile_path)
+        self._medium = Medium(self.infile.infile_path)
 
     @property
     def codec(self):
@@ -137,6 +134,9 @@ class VideoOutstream(FFmpegOutstream):
 
     def add_deinterlace(self):
         self._add_effect('yadif')
+
+    def add_presentation_timestamp(self, pts):
+        self._add_effect('presentation_timestamp', pts=pts)
 
     @property
     def width(self):

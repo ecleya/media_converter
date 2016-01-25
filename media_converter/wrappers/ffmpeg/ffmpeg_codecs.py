@@ -166,3 +166,18 @@ class PCMS16LEFFmpegCodec(PCMS16LE, FFmpegAudioCodecMixin):
     @property
     def codec(self):
         return 'PCM'
+
+
+class VideoCodecs:
+    H264 = H264FFmpegCodec
+    MPEG2 = MPEG2FFmpegCodec
+
+
+class AudioCodecs:
+    AAC = AACFFmpegCodec
+    AC3 = AC3FFmpegCodec
+    EAC3 = EAC3FFmpegCodec
+    ALAC = ALACFFmpegCodec
+    FLAC = FLACFFmpegCodec
+    MP2 = MP2FFmpegCodec
+    PCMS16LE = PCMS16LEFFmpegCodec

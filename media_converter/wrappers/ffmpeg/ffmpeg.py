@@ -21,11 +21,6 @@ class FFmpeg:
         self._command = None
 
     @staticmethod
-    def get_ffmpeg_codec_by_name(codec_name):
-        module = importlib.import_module('media_converter.wrappers.ffmpeg.ffmpeg_codecs')
-        return getattr(module, '%sFFmpegCodec' % codec_name.replace('_', '').upper())
-
-    @staticmethod
     def change_container(src, container):
         dst = fileutil.generate_temporary_file_path(container.extension)
         processutil.call(['/usr/local/bin/ffmpeg', '-y', '-i', src, '-map', '0', '-c', 'copy', dst])
@@ -139,8 +134,8 @@ class FFmpeg:
         if len(outstream.effects) == 0:
             instream = outstream.instream
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] +\
-                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] + \
+                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
 
         if type(outstream) is VideoOutstream:
             instream = outstream.instream
@@ -153,7 +148,7 @@ class FFmpeg:
                 if stream_specifier is not None:
                     effect['args']['stream_specifier'] = stream_specifier
 
-                video_filter = getattr(module, effect['effect_name'].title())(**effect['args'])
+                video_filter = getattr(module, effect['effect_name'].title().replace('_', ''))(**effect['args'])
 
                 video_out = 'vf%d_out' % idx
                 options.append('[%s]%s[%s]' % (video_in, video_filter.get_ffmpeg_filter_option(), video_out))
@@ -169,8 +164,8 @@ class FFmpeg:
             module = importlib.import_module('wrappers.ffmpeg.ffmpeg_filters')
             audio_filter = getattr(module, effect['effect_name'].title())(**effect['args'])
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] +\
-                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile_path), instream.stream_type, str(instream.stream_index))] + \
+                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
                 ['-af', audio_filter.get_ffmpeg_filter_option()]
 
     def _get_stream_specifier(self, instream):
