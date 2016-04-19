@@ -1,4 +1,4 @@
-from media_converter.utils import fileutil, processutil
+from media_converter.utils import processutil
 
 
 def mux(mediafile, *args):

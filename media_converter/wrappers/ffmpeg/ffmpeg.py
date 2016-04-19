@@ -1,7 +1,8 @@
+from pyfile import new_temporary_file
 import importlib
 
 from chardet.universaldetector import UniversalDetector
-from media_converter.utils import fileutil, processutil
+from media_converter.utils import processutil
 
 from media_converter.wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
 
@@ -22,7 +23,7 @@ class FFmpeg:
 
     @staticmethod
     def change_container(src, container):
-        dst = fileutil.generate_temporary_file_path(container.extension)
+        dst = new_temporary_file(container.extension)
         processutil.call(['/usr/local/bin/ffmpeg', '-y', '-i', src, '-map', '0', '-c', 'copy', dst])
 
         return dst
@@ -52,8 +53,8 @@ class FFmpeg:
 
             return detector.result['encoding']
 
-        srt_path = fileutil.generate_temporary_file_path('.srt')
-        tmp_sub_path = fileutil.generate_temporary_file_path('.smi')
+        srt_path = new_temporary_file('.srt')
+        tmp_sub_path = new_temporary_file('.smi')
 
         char_type = _detect(sub_path)
         context = open(sub_path, 'r', encoding=char_type, errors='ignore').read()
@@ -109,7 +110,7 @@ class FFmpeg:
             self._add_stream_options()
             self._add_duration_option()
             self._add_framerate_options()
-            self._command.extend(['-threads', '0', fileutil.generate_temporary_file_path(self._container.extension)])
+            self._command.extend(['-threads', '0', new_temporary_file(self._container.extension)])
 
         return self._command
 

@@ -1,5 +1,4 @@
-from media_converter.models.medium import Medium
-
+from pyfile import File
 from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfile
 
 
@@ -28,7 +27,7 @@ class FFmpegInstream:
 class VideoInstream(FFmpegInstream):
     def __init__(self, infile, stream_index=0):
         FFmpegInstream.__init__(self, infile, 'v', stream_index)
-        self._medium = Medium(self.infile.infile_path)
+        self._medium = File.from_path(self.infile.infile_path)
 
     @property
     def width(self):
@@ -42,7 +41,7 @@ class VideoInstream(FFmpegInstream):
 class AudioInstream(FFmpegInstream):
     def __init__(self, infile, stream_index=0):
         FFmpegInstream.__init__(self, infile, 'a', stream_index)
-        self._medium = Medium(self.infile.infile_path)
+        self._medium = File.from_path(self.infile.infile_path)
 
     @property
     def codec(self):
