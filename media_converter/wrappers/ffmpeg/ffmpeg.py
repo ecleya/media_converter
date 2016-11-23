@@ -1,14 +1,16 @@
-from pyfile import new_temporary_file
 import importlib
 
 from chardet.universaldetector import UniversalDetector
 from media_converter.utils import processutil
+from media_converter.mixins import TemporaryFileMixin
 
 from media_converter.wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
 
 
-class FFmpeg:
+class FFmpeg(TemporaryFileMixin):
     def __init__(self, outstreams, container, analyze_duration=None, probe_size=None):
+        TemporaryFileMixin.__init__(self)
+
         self._outstreams = outstreams
         self._container = container
         self._analyze_duration = analyze_duration
@@ -21,9 +23,8 @@ class FFmpeg:
         self._infiles = None
         self._command = None
 
-    @staticmethod
-    def change_container(src, container):
-        dst = new_temporary_file(container.extension)
+    def change_container(self, src, container):
+        dst = self._new_tmp_filepath(container.extension)
         processutil.call(['/usr/local/bin/ffmpeg', '-y', '-i', src, '-map', '0', '-c', 'copy', dst])
 
         return dst
@@ -37,8 +38,7 @@ class FFmpeg:
 
         return float(vol_info.split(' ')[1])
 
-    @staticmethod
-    def smi_to_srt(sub_path):
+    def smi_to_srt(self, sub_path):
         def _detect(file_path):
             detector = UniversalDetector()
             fp = open(file_path, 'rb')
@@ -53,8 +53,8 @@ class FFmpeg:
 
             return detector.result['encoding']
 
-        srt_path = new_temporary_file('.srt')
-        tmp_sub_path = new_temporary_file('.smi')
+        srt_path = self._new_tmp_filepath('.srt')
+        tmp_sub_path = self._new_tmp_filepath('.smi')
 
         char_type = _detect(sub_path)
         context = open(sub_path, 'r', encoding=char_type, errors='ignore').read()
@@ -110,7 +110,7 @@ class FFmpeg:
             self._add_stream_options()
             self._add_duration_option()
             self._add_framerate_options()
-            self._command.extend(['-threads', '0', new_temporary_file(self._container.extension)])
+            self._command.extend(['-threads', '0', self._new_tmp_filepath(self._container.extension)])
 
         return self._command
 

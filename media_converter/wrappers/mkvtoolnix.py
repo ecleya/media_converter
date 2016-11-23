@@ -1,20 +1,21 @@
 from media_converter.utils import processutil
+from media_converter.mixins import TemporaryFileMixin
 
 
-def mux(mediafile, *args):
-    mkv_path = fileutil.generate_temporary_file_path('.mkv')
-    cmd = ['/usr/local/bin/mkvmerge', '-o', mkv_path, mediafile]
-    cmd.extend(args)
-    processutil.call(cmd)
+class MKVToolnix(TemporaryFileMixin):
+    def mux(self, mediafile, *args):
+        mkv_path = self._new_tmp_filepath('.mkv')
+        cmd = ['/usr/local/bin/mkvmerge', '-o', mkv_path, mediafile]
+        cmd.extend(args)
+        processutil.call(cmd)
 
-    return mkv_path
+        return mkv_path
 
+    def concat(self, mediafile, *args):
+        mkv_path = self._new_tmp_filepath('.mkv')
+        cmd = ['/usr/local/bin/mkvmerge', '-o', mkv_path, '--no-chapters', '--no-subtitles', mediafile]
+        for arg in args:
+            cmd.extend(['--no-chapters', '--no-subtitles', '+%s' % arg])
+        processutil.call(cmd)
 
-def concat(mediafile, *args):
-    mkv_path = fileutil.generate_temporary_file_path('.mkv')
-    cmd = ['/usr/local/bin/mkvmerge', '-o', mkv_path, '--no-chapters', '--no-subtitles', mediafile]
-    for arg in args:
-        cmd.extend(['--no-chapters', '--no-subtitles', '+%s' % arg])
-    processutil.call(cmd)
-
-    return mkv_path
+        return mkv_path
