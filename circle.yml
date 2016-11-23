@@ -1,0 +1,15 @@
+machine:
+  python:
+    version: 3.5.2
+checkout:
+  pre:
+    - sudo apt-get install mediainfo
+dependencies:
+  override:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pytest pytest-cov flake8 unittest-xml-reporting
+test:
+  override:
+    - py.test
+    - flake8

@@ -1,6 +1,7 @@
 import unittest
 
-from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfile, FFmpegInfileImageSequence, FFmpegInfileImage, FFmpegInfileSilentAudio
+from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfile, FFmpegInfileImageSequence,\
+    FFmpegInfileImage, FFmpegInfileSilentAudio
 
 
 class TestFFmpeg(unittest.TestCase):

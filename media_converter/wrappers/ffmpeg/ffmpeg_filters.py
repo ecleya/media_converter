@@ -90,4 +90,3 @@ class Volume(FFmpegAudioFilter):
 
     def get_ffmpeg_filter_option(self):
         return 'volume=%fdB' % self._volume
-

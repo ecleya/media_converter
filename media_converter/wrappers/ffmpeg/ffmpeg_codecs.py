@@ -27,13 +27,16 @@ class VideoCopyFFmpegCodec(FFmpegVideoCodecMixin):
 
 
 class H264FFmpegCodec(H264, FFmpegVideoCodecMixin):
-    def __init__(self, constant_rate_factor=18.0, quantization_parameter=None, pixel_format='yuv420p', profile='high', level='4.0', aspect_ratio=None, frame_rate=None):
-        H264.__init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level, aspect_ratio, frame_rate)
+    def __init__(self, constant_rate_factor=18.0, quantization_parameter=None, pixel_format='yuv420p', profile='high',
+                 level='4.0', aspect_ratio=None, frame_rate=None):
+        H264.__init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile,
+                      level, aspect_ratio, frame_rate)
         FFmpegVideoCodecMixin.__init__(self, 'h264')
 
     def get_ffmpeg_options(self, track_no=0):
         options = ['-c:v', self._codec_name]
-        options.extend(['-crf', str(self._constant_rate_factor)] if self._quantization_parameter is None else ['-qp', str(self._quantization_parameter)])
+        options.extend(['-crf', str(self._constant_rate_factor)]
+                       if self._quantization_parameter is None else ['-qp', str(self._quantization_parameter)])
         options.extend(['-pix_fmt', self._pixel_format])
         if self._quantization_parameter != 0:
             options.extend(['-profile:v', self._profile])
