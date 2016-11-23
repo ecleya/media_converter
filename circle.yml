@@ -9,6 +9,7 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.txt
     - pip install pytest pytest-cov flake8 unittest-xml-reporting
+    - pip install pycountry pillow
 test:
   override:
     - py.test
