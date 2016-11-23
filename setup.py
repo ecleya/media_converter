@@ -11,7 +11,7 @@ setup(
     packages=find_packages(),
     package_data={'': PACKAGE_DATA, },
     zip_safe=True,
-    install_requires=['chardet',],
+    install_requires=['chardet'],
     author='Kiheon Choi',
     author_email='ecleya' '@' 'smartstudy.co.kr',
     maintainer='Kiheon Choi',

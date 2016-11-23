@@ -44,7 +44,8 @@ class SubtitleCodec(Codec):
 
 
 class H264(VideoCodec):
-    def __init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level, aspect_ratio, frame_rate):
+    def __init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level,
+                 aspect_ratio, frame_rate):
         VideoCodec.__init__(self)
         self._constant_rate_factor = constant_rate_factor
         self._quantization_parameter = quantization_parameter

@@ -31,7 +31,8 @@ class FFmpeg(TemporaryFileMixin):
 
     @staticmethod
     def get_mean_volume(src):
-        ret, out, err = processutil.call(['/usr/local/bin/ffmpeg', '-i', src, '-af', 'volumedetect', '-f', 'null', '/dev/null'])
+        ret, out, err = processutil.call(['/usr/local/bin/ffmpeg', '-i', src,
+                                          '-af', 'volumedetect', '-f', 'null', '/dev/null'])
         vol_info = err
         vol_info = vol_info[vol_info.find('mean_volume:'):]
         vol_info = vol_info[:vol_info.find('\n')]
@@ -135,8 +136,9 @@ class FFmpeg(TemporaryFileMixin):
         if len(outstream.effects) == 0:
             instream = outstream.instream
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] + \
-                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type,
+                                          str(instream.stream_index))] + \
+                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
 
         if type(outstream) is VideoOutstream:
             instream = outstream.instream
@@ -165,8 +167,9 @@ class FFmpeg(TemporaryFileMixin):
             module = importlib.import_module('wrappers.ffmpeg.ffmpeg_filters')
             audio_filter = getattr(module, effect['effect_name'].title())(**effect['args'])
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile_path), instream.stream_type, str(instream.stream_index))] + \
-                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile_path), instream.stream_type,
+                                          str(instream.stream_index))] + \
+                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
                 ['-af', audio_filter.get_ffmpeg_filter_option()]
 
     def _get_stream_specifier(self, instream):
