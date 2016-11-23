@@ -1,13 +1,16 @@
 import importlib
 
 from chardet.universaldetector import UniversalDetector
+from media_converter.utils import processutil
+from media_converter.mixins import TemporaryFileMixin
 
-from utils import fileutil, processutil
-from wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
+from media_converter.wrappers.ffmpeg.ffmpeg_streams import AudioOutstream, VideoOutstream
 
 
-class FFmpeg:
+class FFmpeg(TemporaryFileMixin):
     def __init__(self, outstreams, container, analyze_duration=None, probe_size=None):
+        TemporaryFileMixin.__init__(self)
+
         self._outstreams = outstreams
         self._container = container
         self._analyze_duration = analyze_duration
@@ -20,14 +23,8 @@ class FFmpeg:
         self._infiles = None
         self._command = None
 
-    @staticmethod
-    def get_ffmpeg_codec_by_name(codec_name):
-        module = importlib.import_module('wrappers.ffmpeg.ffmpeg_codecs')
-        return getattr(module, '%sFFmpegCodec' % codec_name.replace('_', '').upper())
-
-    @staticmethod
-    def change_container(src, container):
-        dst = fileutil.generate_temporary_file_path(container.extension)
+    def change_container(self, src, container):
+        dst = self._new_tmp_filepath(container.extension)
         processutil.call(['/usr/local/bin/ffmpeg', '-y', '-i', src, '-map', '0', '-c', 'copy', dst])
 
         return dst
@@ -41,8 +38,7 @@ class FFmpeg:
 
         return float(vol_info.split(' ')[1])
 
-    @staticmethod
-    def smi_to_srt(sub_path):
+    def smi_to_srt(self, sub_path):
         def _detect(file_path):
             detector = UniversalDetector()
             fp = open(file_path, 'rb')
@@ -57,8 +53,8 @@ class FFmpeg:
 
             return detector.result['encoding']
 
-        srt_path = fileutil.generate_temporary_file_path('.srt')
-        tmp_sub_path = fileutil.generate_temporary_file_path('.smi')
+        srt_path = self._new_tmp_filepath('.srt')
+        tmp_sub_path = self._new_tmp_filepath('.smi')
 
         char_type = _detect(sub_path)
         context = open(sub_path, 'r', encoding=char_type, errors='ignore').read()
@@ -114,7 +110,7 @@ class FFmpeg:
             self._add_stream_options()
             self._add_duration_option()
             self._add_framerate_options()
-            self._command.extend(['-threads', '0', fileutil.generate_temporary_file_path(self._container.extension)])
+            self._command.extend(['-threads', '0', self._new_tmp_filepath(self._container.extension)])
 
         return self._command
 
@@ -139,8 +135,8 @@ class FFmpeg:
         if len(outstream.effects) == 0:
             instream = outstream.instream
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] +\
-                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] + \
+                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream))
 
         if type(outstream) is VideoOutstream:
             instream = outstream.instream
@@ -148,12 +144,12 @@ class FFmpeg:
             options = []
             idx = 0
             for effect in outstream.effects:
-                module = importlib.import_module('wrappers.ffmpeg.ffmpeg_filters')
+                module = importlib.import_module('media_converter.wrappers.ffmpeg.ffmpeg_filters')
                 stream_specifier = self._get_stream_specifier(effect['instream'])
                 if stream_specifier is not None:
                     effect['args']['stream_specifier'] = stream_specifier
 
-                video_filter = getattr(module, effect['effect_name'].title())(**effect['args'])
+                video_filter = getattr(module, effect['effect_name'].title().replace('_', ''))(**effect['args'])
 
                 video_out = 'vf%d_out' % idx
                 options.append('[%s]%s[%s]' % (video_in, video_filter.get_ffmpeg_filter_option(), video_out))
@@ -169,8 +165,8 @@ class FFmpeg:
             module = importlib.import_module('wrappers.ffmpeg.ffmpeg_filters')
             audio_filter = getattr(module, effect['effect_name'].title())(**effect['args'])
 
-            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile), instream.stream_type, str(instream.stream_index))] +\
-                outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
+            return ['-map', '%d:%s:%s' % (self.infiles.index(instream.infile_path), instream.stream_type, str(instream.stream_index))] + \
+                   outstream.target_codec.get_ffmpeg_options(self._get_outstream_index(outstream)) +\
                 ['-af', audio_filter.get_ffmpeg_filter_option()]
 
     def _get_stream_specifier(self, instream):

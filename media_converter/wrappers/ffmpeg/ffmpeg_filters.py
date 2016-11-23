@@ -70,6 +70,15 @@ class Yadif(FFmpegVideoFilter):
         return 'yadif'
 
 
+class PresentationTimestamp(FFmpegVideoFilter):
+    def __init__(self, pts):
+        FFmpegVideoFilter.__init__(self, stream_specifier=None)
+        self._pts = pts
+
+    def get_ffmpeg_filter_option(self):
+        return 'setpts=%s*PTS' % str(self._pts)
+
+
 class FFmpegAudioFilter:
     def get_ffmpeg_filter_option(self):
         raise NotImplemented()

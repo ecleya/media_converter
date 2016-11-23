@@ -4,7 +4,8 @@ python:
   - '3.4.3'
 
 install:
-  - pip install -i requirements.txt
+  - pip install pytest-cov
+  - pip install -r requirements.txt
 
 script:
-  - py.test
+  - py.test --cov-report term-missing --cov=media_converter

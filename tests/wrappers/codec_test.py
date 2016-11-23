@@ -1,6 +1,7 @@
 import unittest
-from wrappers import Codec
-from wrappers.codec import H264
+
+from media_converter.wrappers import Codec
+from media_converter.wrappers import H264
 
 
 class TestFFmpeg(unittest.TestCase):
@@ -8,4 +9,3 @@ class TestFFmpeg(unittest.TestCase):
         h264_codec = Codec.get_codec_by_name('H264')
 
         self.assertTrue(h264_codec is H264)
-

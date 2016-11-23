@@ -1,0 +1,91 @@
+# Created by http://gitignore.io
+
+.env
+
+### Python ###
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+__pycache__
+.cache
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage*
+.tox
+nosetests.xml
+junit-*.xml
+coverage.xml
+test_db
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+
+
+### SublimeText ###
+# SublimeText project files
+*.sublime-workspace
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Database
+*.db
+
+# Django media files
+media/
+
+# Django Collected Static files
+collected_static/
+
+# Coverage
+htmlcov/
+coverage.xml
+junit-*.xml
+
+
+# Sphinx
+_build
+
+# pycharm
+.idea
+
+# vagrant
+Vagrantfile
+.vagrant

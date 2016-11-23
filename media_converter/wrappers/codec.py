@@ -7,7 +7,7 @@ class Codec:
 
     @staticmethod
     def get_codec_by_name(codec_name):
-        module = importlib.import_module('wrappers.codec')
+        module = importlib.import_module('media_converter.wrappers.codec')
         return getattr(module, codec_name.upper())
 
     def is_video_codec(self):
@@ -83,6 +83,11 @@ class ALAC(LosslessAudioCodec):
         LosslessAudioCodec.__init__(self, channels, sampling_rate)
 
 
+class FLAC(LosslessAudioCodec):
+    def __init__(self, channels=None, sampling_rate=None):
+        LosslessAudioCodec.__init__(self, channels, sampling_rate)
+
+
 class PCMS16LE(LosslessAudioCodec):
     def __init__(self, channels=None, sampling_rate=None):
         LosslessAudioCodec.__init__(self, channels, sampling_rate)
@@ -91,6 +96,7 @@ class PCMS16LE(LosslessAudioCodec):
 class MP2(AudioCodec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
+
 
 class SRT(SubtitleCodec):
     def __init__(self):

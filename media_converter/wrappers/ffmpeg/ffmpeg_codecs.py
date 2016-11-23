@@ -1,4 +1,4 @@
-from wrappers.codec import H264, AAC, ALAC, PCMS16LE, MPEG2, MP2, AC3, EAC3
+from media_converter.wrappers import H264, AAC, ALAC, PCMS16LE, MPEG2, MP2, AC3, EAC3, FLAC
 
 
 class FFmpegCodecMixin:
@@ -26,7 +26,7 @@ class VideoCopyFFmpegCodec(FFmpegVideoCodecMixin):
         return ['-c:v:%d' % track_no, 'copy']
 
 
-class H264FFmpegCodec(H264, FFmpegCodecMixin):
+class H264FFmpegCodec(H264, FFmpegVideoCodecMixin):
     def __init__(self, constant_rate_factor=18.0, quantization_parameter=None, pixel_format='yuv420p', profile='high', level='4.0', aspect_ratio=None, frame_rate=None):
         H264.__init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level, aspect_ratio, frame_rate)
         FFmpegVideoCodecMixin.__init__(self, 'h264')
@@ -135,7 +135,17 @@ class ALACFFmpegCodec(ALAC, FFmpegAudioCodecMixin):
 
     @property
     def codec(self):
-        return 'alac'
+        return 'A_ALAC'
+
+
+class FLACFFmpegCodec(FLAC, FFmpegAudioCodecMixin):
+    def __init__(self, channels=None, sampling_rate=None):
+        FLAC.__init__(self, channels=channels, sampling_rate=sampling_rate)
+        FFmpegAudioCodecMixin.__init__(self, codec_name='flac')
+
+    @property
+    def codec(self):
+        return 'A_FLAC'
 
 
 class MP2FFmpegCodec(MP2, FFmpegAudioCodecMixin):
@@ -156,3 +166,18 @@ class PCMS16LEFFmpegCodec(PCMS16LE, FFmpegAudioCodecMixin):
     @property
     def codec(self):
         return 'PCM'
+
+
+class VideoCodecs:
+    H264 = H264FFmpegCodec
+    MPEG2 = MPEG2FFmpegCodec
+
+
+class AudioCodecs:
+    AAC = AACFFmpegCodec
+    AC3 = AC3FFmpegCodec
+    EAC3 = EAC3FFmpegCodec
+    ALAC = ALACFFmpegCodec
+    FLAC = FLACFFmpegCodec
+    MP2 = MP2FFmpegCodec
+    PCMS16LE = PCMS16LEFFmpegCodec
