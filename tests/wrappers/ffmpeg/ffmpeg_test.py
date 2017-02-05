@@ -1,4 +1,3 @@
-import pytest
 import unittest
 
 from media_converter.wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream,\
@@ -57,7 +56,6 @@ class TestFFmpeg(unittest.TestCase):
                           '-profile:v', 'high', '-level', '4.0',
                           '-map', '0:a:0', '-c:a:0', 'alac', '-threads', '0'])
 
-    @pytest.mark.skip
     def test_multiple_audio_track(self):
         src = 'a.m4v'
         video_codec = VideoCodecs.H264()
@@ -113,7 +111,6 @@ class TestFFmpeg(unittest.TestCase):
                           '-map', '0:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
                           '-threads', '0'])
 
-    @pytest.mark.skip
     def test_overlay_watermark_image(self):
         video_in = 'a.mkv'
         image_in = 'a.png'
