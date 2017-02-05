@@ -4,7 +4,7 @@ import unittest
 from media_converter.wrappers.ffmpeg import FFmpeg, VideoOutstream, AudioOutstream,\
     VideoInstream, AudioInstream, SubtitleInstream
 from media_converter.wrappers.ffmpeg.ffmpeg_codecs import VideoCodecs, AudioCodecs
-from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfileImageSequence
+from media_converter.wrappers.ffmpeg.ffmpeg_infiles import FFmpegInfileImageSequence, FFmpegInfileSilentAudio
 
 from media_converter.models.medium import Container
 
@@ -169,4 +169,21 @@ class TestFFmpeg(unittest.TestCase):
                           '-map', '[vf0_out]', '-c:v', 'h264', '-crf', '13.0', '-pix_fmt', 'yuv420p', '-profile:v',
                           'high', '-level', '4.0',
                           '-map', '0:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
+                          '-threads', '0'])
+
+    def test_silent_audio(self):
+        src = 'a.mkv'
+        video_codec = VideoCodecs.H264(constant_rate_factor=13.0)
+        audio_codec = AudioCodecs.AAC(bitrate='256k', channels=2, sampling_rate=48000)
+
+        video_outstream = VideoOutstream(src, video_codec)
+        audio_outstream = AudioOutstream(AudioInstream(FFmpegInfileSilentAudio(5)), audio_codec)
+
+        ffmpeg = FFmpeg([video_outstream, audio_outstream], Container.MATROSKA)
+        self.assertEqual(ffmpeg.command[:-1],
+                         ['/usr/local/bin/ffmpeg', '-y', '-i', src,
+                          '-ar', '48000', '-ac', '1', '-f', 's16le', '-t', '5', '-i', '/dev/zero',
+                          '-map', '0:v:0', '-c:v', 'h264', '-crf', '13.0', '-pix_fmt', 'yuv420p', '-profile:v',
+                          'high', '-level', '4.0',
+                          '-map', '1:a:0', '-c:a:0', 'libfdk_aac', '-b:a:0', '256k', '-ac:a:0', '2', '-ar:a:0', '48000',
                           '-threads', '0'])
