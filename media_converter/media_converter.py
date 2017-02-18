@@ -1,26 +1,47 @@
 import subprocess
 from pyfileinfo import PyFileInfo
+from media_converter.streams import AudioOutstream
 from media_converter.mixins import TemporaryFileMixin
 
 
 class MediaConverter(TemporaryFileMixin):
-    def __init__(self, src=None, dst=None):
+    def __init__(self, outstreams, dst):
         TemporaryFileMixin.__init__(self)
 
-        self._srcs = []
-        if src is not None:
-            self._append_source(src)
+        if not isinstance(outstreams, list):
+            outstreams = [outstreams]
 
+        self._outstreams = outstreams
         self._dst = dst
+        self._command = None
 
     def convert(self):
-        subprocess.call(self._command())
+        subprocess.call(self.command)
 
-    def _command(self):
-        return ['/usr/local/bin/ffmpeg', '-i', self._srcs[0].path, self._dst]
+    @property
+    def command(self):
+        self._init_command()
+        self._append_infiles()
+        self._append_codecs()
+        self._append_dst()
 
-    def _append_source(self, src):
-        if isinstance(src, str):
-            src = PyFileInfo(src)
+        return self._command
 
-        self._srcs.append(src)
+    def _init_command(self):
+        self._command = ['/usr/local/bin/ffmpeg', '-y']
+
+    def _append_infiles(self):
+        for outstream in self._outstreams:
+            if isinstance(outstream, str):
+                self._command.extend(['-i', outstream])
+            if isinstance(outstream, AudioOutstream):
+                self._command.extend(['-i', outstream.instream])
+
+    def _append_codecs(self):
+        for outstream in self._outstreams:
+            if isinstance(outstream, AudioOutstream):
+                codec = outstream.codec
+                self._command.extend(['-c:a', 'aac', '-b:a', str(codec.bitrate), '-ac', str(codec.channels), '-ar', str(codec.sampling_rate)])
+
+    def _append_dst(self):
+        self._command.append(self._dst)
