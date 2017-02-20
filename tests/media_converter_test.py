@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from media_converter import MediaConverter, codecs
-from media_converter.streams import VideoOutstream, AudioOutstream
+from media_converter.tracks import VideoTrack, AudioTrack
 
 
 class TestMediaConverter(TestCase):
@@ -12,7 +12,7 @@ class TestMediaConverter(TestCase):
 
     @mock.patch('subprocess.call')
     def test_audio_convert(self, mock_subprocess):
-        MediaConverter(AudioOutstream('a.wav', codecs.AAC('256k', 2, 44100)), 'a.m4a').convert()
+        MediaConverter(AudioTrack('a.wav', codecs.AAC('256k', 2, 44100)), 'a.m4a').convert()
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.wav',
@@ -22,8 +22,8 @@ class TestMediaConverter(TestCase):
 
     @mock.patch('subprocess.call')
     def test_video_convert(self, mock_subprocess):
-        MediaConverter([VideoOutstream('a.mp4', codecs.MPEG2('3000k', '16:9', '23.97')),
-                        AudioOutstream('a.mp4', codecs.AAC('256k', 2, 44100))], 'b.mp4').convert()
+        MediaConverter([VideoTrack('a.mp4', codecs.MPEG2('3000k', '16:9', '23.97')),
+                        AudioTrack('a.mp4', codecs.AAC('256k', 2, 44100))], 'b.mp4').convert()
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.mp4',

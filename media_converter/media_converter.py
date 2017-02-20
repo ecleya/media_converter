@@ -1,17 +1,18 @@
 import subprocess
 from pyfileinfo import PyFileInfo
+from media_converter.tracks import AudioTrack, VideoTrack
 from media_converter.streams import VideoOutstream, AudioOutstream
 from media_converter.mixins import TemporaryFileMixin
 
 
 class MediaConverter(TemporaryFileMixin):
-    def __init__(self, outstreams, dst):
+    def __init__(self, tracks, dst):
         TemporaryFileMixin.__init__(self)
 
-        if not isinstance(outstreams, list):
-            outstreams = [outstreams]
+        if not isinstance(tracks, list):
+            tracks = [tracks]
 
-        self._outstreams = outstreams
+        self._tracks = tracks
         self._dst = dst
         self._command = None
 
@@ -31,19 +32,19 @@ class MediaConverter(TemporaryFileMixin):
         self._command = ['/usr/local/bin/ffmpeg', '-y']
 
     def _append_infiles(self):
-        for outstream in self._outstreams:
-            if isinstance(outstream, str):
-                self._command.extend(['-i', outstream])
-            if isinstance(outstream, AudioOutstream):
-                self._command.extend(['-i', outstream.instream])
+        for track in self._tracks:
+            if isinstance(track, str):
+                self._command.extend(['-i', track])
+            if isinstance(track, AudioTrack):
+                self._command.extend(['-i', track.outstream])
 
     def _append_codecs(self):
-        for outstream in self._outstreams:
-            if isinstance(outstream, VideoOutstream):
-                codec = outstream.codec
+        for track in self._tracks:
+            if isinstance(track, VideoTrack):
+                codec = track.codec
                 self._command.extend(['-c:v', 'mpeg', '-b:v', str(codec.bitrate), '-aspect', str(codec.aspect_ratio), '-r', str(codec.frame_rate)])
-            if isinstance(outstream, AudioOutstream):
-                codec = outstream.codec
+            if isinstance(track, AudioTrack):
+                codec = track.codec
                 self._command.extend(['-c:a', 'aac', '-b:a', str(codec.bitrate), '-ac', str(codec.channels), '-ar', str(codec.sampling_rate)])
 
     def _append_dst(self):

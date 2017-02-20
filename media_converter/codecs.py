@@ -28,6 +28,7 @@ class VideoCodec(Codec):
     def frame_rate(self):
         return self._frame_rate
 
+
 class AudioCodec(Codec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
         Codec.__init__(self)
