@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pyfileinfo import PyFileInfo
 from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
@@ -21,12 +22,15 @@ class MediaConverter(TemporaryFileMixin):
     def convert(self):
         subprocess.call(self.command)
 
+        shutil.move(self.command[-1], self._dst.path)
+
     @property
     def command(self):
-        self._init_command()
-        self._append_instreams()
-        self._append_tracks()
-        self._append_dst()
+        if self._command is None:
+            self._init_command()
+            self._append_instreams()
+            self._append_tracks()
+            self._append_dst()
 
         return self._command
 
@@ -68,7 +72,7 @@ class MediaConverter(TemporaryFileMixin):
             self._command.extend(track.codec.options_for_ffmpeg())
 
     def _append_dst(self):
-        self._command.append(self._dst.path)
+        self._command.append(self._new_tmp_filepath(self._dst.extension))
 
     def _get_default_codecs(self):
         default_codecs = {
