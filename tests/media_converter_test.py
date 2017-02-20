@@ -1,16 +1,18 @@
-from unittest import TestCase, mock, skip
+from unittest import TestCase, mock
 from media_converter import MediaConverter, codecs
 from media_converter.tracks import VideoTrack, AudioTrack
 from media_converter.streams import VideoOutstream
 
 
 class TestMediaConverter(TestCase):
-    @skip
     @mock.patch('subprocess.call')
     def test_simple_convert(self, mock_subprocess):
-        MediaConverter('a.mkv', 'b.mp4').convert()
+        MediaConverter('a.mp4', 'b.mkv').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y', '-i', 'a.mkv', 'b.mp4']
+        cmd = ['/usr/local/bin/ffmpeg', '-y', '-i', 'a.mp4',
+               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '3.1',
+               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -30,7 +32,7 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.mp4',
-               '-map', '0:v:0', '-c:v', 'mpeg', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
+               '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                'b.mkv']
         mock_subprocess.assert_called_with(cmd)
@@ -43,7 +45,7 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.mp4', '-filter_complex', '[0:v:0]scale=-2:480[vout0]',
-               '-map', '[vout0]', '-c:v', 'mpeg', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
+               '-map', '[vout0]', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                'b.mkv']
         mock_subprocess.assert_called_with(cmd)

@@ -1,6 +1,6 @@
 import subprocess
 from pyfileinfo import PyFileInfo
-from media_converter.codecs import VideoCodec, AudioCodec
+from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
 from media_converter.tracks import Track, AudioTrack, VideoTrack
 from media_converter.streams import VideoInstream, AudioInstream, VideoOutstream, AudioOutstream
 from media_converter.mixins import TemporaryFileMixin
@@ -14,7 +14,7 @@ class MediaConverter(TemporaryFileMixin):
             tracks = [tracks]
 
         self._tracks = tracks
-        self._dst = dst
+        self._dst = PyFileInfo(dst)
         self._command = None
         self._infiles = None
 
@@ -39,10 +39,15 @@ class MediaConverter(TemporaryFileMixin):
         for track in self._tracks:
             if isinstance(track, Track):
                 yield track
+            elif isinstance(track, str):
+                for codec in self._get_default_codecs():
+                    if isinstance(codec, VideoCodec):
+                        yield VideoTrack(track, codec)
+                    elif isinstance(codec, AudioCodec):
+                        yield AudioTrack(track, codec)
 
     def _append_instreams(self):
-        for track in self._tracks:
-            print(track, track.outstream)
+        for track in self.tracks:
             instream = track.outstream.instream
             if instream.as_ffmpeg_instream() in self._infiles:
                 continue
@@ -51,7 +56,7 @@ class MediaConverter(TemporaryFileMixin):
             self._command.extend(instream.as_ffmpeg_instream())
 
     def _append_tracks(self):
-        for track in self._tracks:
+        for track in self.tracks:
             instream = track.outstream.instream
             infile_index = self._infiles.index(instream.as_ffmpeg_instream())
             filter = track.outstream.filter_options_for_ffmpeg(infile_index)
@@ -60,12 +65,15 @@ class MediaConverter(TemporaryFileMixin):
             else:
                 self._command.extend(['-filter_complex', filter, '-map', '[vout0]'])
 
-            if isinstance(track, VideoTrack):
-                codec = track.codec
-                self._command.extend(['-c:v', 'mpeg', '-b:v', str(codec.bitrate), '-aspect', str(codec.aspect_ratio), '-r', str(codec.frame_rate)])
-            if isinstance(track, AudioTrack):
-                codec = track.codec
-                self._command.extend(['-c:a', 'aac', '-b:a', str(codec.bitrate), '-ac', str(codec.channels), '-ar', str(codec.sampling_rate)])
+            self._command.extend(track.codec.options_for_ffmpeg())
 
     def _append_dst(self):
-        self._command.append(self._dst)
+        self._command.append(self._dst.path)
+
+    def _get_default_codecs(self):
+        default_codecs = {
+            '.mkv': [H264, AAC]
+        }
+
+        for codec in default_codecs[self._dst.extension.lower()]:
+            yield codec()
