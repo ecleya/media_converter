@@ -1,6 +1,6 @@
 import subprocess
 from pyfileinfo import PyFileInfo
-from media_converter.streams import AudioOutstream
+from media_converter.streams import VideoOutstream, AudioOutstream
 from media_converter.mixins import TemporaryFileMixin
 
 
@@ -39,6 +39,9 @@ class MediaConverter(TemporaryFileMixin):
 
     def _append_codecs(self):
         for outstream in self._outstreams:
+            if isinstance(outstream, VideoOutstream):
+                codec = outstream.codec
+                self._command.extend(['-c:v', 'mpeg', '-b:v', str(codec.bitrate), '-aspect', str(codec.aspect_ratio), '-r', str(codec.frame_rate)])
             if isinstance(outstream, AudioOutstream):
                 codec = outstream.codec
                 self._command.extend(['-c:a', 'aac', '-b:a', str(codec.bitrate), '-ac', str(codec.channels), '-ar', str(codec.sampling_rate)])

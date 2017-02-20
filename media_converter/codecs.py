@@ -17,8 +17,16 @@ class VideoCodec(Codec):
     def __init__(self, aspect_ratio=None, frame_rate=None):
         Codec.__init__(self)
 
+        self._aspect_ratio = aspect_ratio
         self._frame_rate = frame_rate
 
+    @property
+    def aspect_ratio(self):
+        return self._aspect_ratio
+
+    @property
+    def frame_rate(self):
+        return self._frame_rate
 
 class AudioCodec(Codec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
@@ -48,7 +56,7 @@ class SubtitleCodec(Codec):
 class H264(VideoCodec):
     def __init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level,
                  aspect_ratio, frame_rate):
-        VideoCodec.__init__(self, frame_rate)
+        VideoCodec.__init__(self, aspect_ratio, frame_rate)
 
         self._constant_rate_factor = constant_rate_factor
         self._quantization_parameter = quantization_parameter
@@ -61,7 +69,7 @@ class H264(VideoCodec):
 class H265(VideoCodec):
     def __init__(self, constant_rate_factor, quantization_parameter, pixel_format, profile, level,
                  aspect_ratio, frame_rate):
-        VideoCodec.__init__(self, frame_rate)
+        VideoCodec.__init__(self, aspect_ratio, frame_rate)
 
         self._constant_rate_factor = constant_rate_factor
         self._quantization_parameter = quantization_parameter
@@ -73,10 +81,13 @@ class H265(VideoCodec):
 
 class MPEG2(VideoCodec):
     def __init__(self, bitrate, aspect_ratio, frame_rate):
-        VideoCodec.__init__(self, frame_rate)
+        VideoCodec.__init__(self, aspect_ratio, frame_rate)
 
         self._bitrate = bitrate
-        self._aspect_ratio = aspect_ratio
+
+    @property
+    def bitrate(self):
+        return self._bitrate
 
 
 class AAC(AudioCodec):
