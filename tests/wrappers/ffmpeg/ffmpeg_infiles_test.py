@@ -30,13 +30,13 @@ class TestFFmpeg(unittest.TestCase):
         self.assertEqual(lhs, rhs)
 
     def test_eq_silent_audio(self):
-        lhs = FFmpegInfileSilentAudio()
-        rhs = FFmpegInfileSilentAudio()
+        lhs = FFmpegInfileSilentAudio(5)
+        rhs = FFmpegInfileSilentAudio(5)
 
         self.assertEqual(lhs, rhs)
 
     def test_ne_other_type(self):
-        lhs = FFmpegInfileSilentAudio()
+        lhs = FFmpegInfileSilentAudio(5)
         rhs = FFmpegInfileImage('a.png')
 
         self.assertNotEqual(lhs, rhs)

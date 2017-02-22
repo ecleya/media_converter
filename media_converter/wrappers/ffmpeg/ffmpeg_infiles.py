@@ -48,11 +48,14 @@ class FFmpegInfileImage(FFmpegInfile):
 
 
 class FFmpegInfileSilentAudio(FFmpegInfile):
-    def __init__(self):
+    def __init__(self, duration):
         FFmpegInfile.__init__(self, '/dev/zero')
 
+        self._duration = duration
+
     def get_ffmpeg_options(self):
-        return ['-ar', '48000', '-ac', '1', '-f', 's16le', '-i', self._infile_path]
+        return ['-ar', '48000', '-ac', '1', '-f', 's16le', '-t', str(self._duration), '-i', self._infile_path]
 
     def __eq__(self, other):
-        return type(other) is FFmpegInfileSilentAudio
+        return type(other) is FFmpegInfileSilentAudio and \
+               self._duration == other._duration

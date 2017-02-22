@@ -1,17 +1,32 @@
-from media_converter import version, PROJECT
+import os.path
+import warnings
+
 from setuptools import setup, find_packages
 
 
-MODULE_NAME = 'media_converter'
-PACKAGE_DATA = list()
+def version():
+    try:
+        root = os.path.abspath(os.path.dirname(__file__))
+        with open(os.path.join(root, '.version')) as f:
+            return f.read().strip()
+    except IOError:
+        warnings.warn("Couldn't found .version file", RuntimeWarning)
+        return ''
+
+
+requirements = [
+    'chardet',
+    'pyfileinfo',
+]
+
 
 setup(
-    name=PROJECT,
-    version=version,
+    name='media_converter',
+    version=version(),
     packages=find_packages(),
-    package_data={'': PACKAGE_DATA, },
+    package_data={},
     zip_safe=True,
-    install_requires=['chardet'],
+    install_requires=requirements,
     author='Kiheon Choi',
     author_email='ecleya' '@' 'smartstudy.co.kr',
     maintainer='Kiheon Choi',
