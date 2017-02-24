@@ -40,12 +40,12 @@ class TestMediaConverter(TestCase):
     def test_video_convert(self, mock_subprocess, mock_tmp_filepath, mock_shutil):
         mock_tmp_filepath.return_value = 'tmp.mkv'
         MediaConverter([VideoTrack('a.mp4', codecs.MPEG2('3000k', '16:9', '23.97')),
-                        AudioTrack('a.mp4', codecs.AAC('256k', 2, 44100))], 'b.mkv').convert()
+                        AudioTrack('a.mp4', codecs.MP2('256k', 2, 44100))], 'b.mkv').convert()
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.mp4',
                '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
-               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
+               '-map', '0:a:0', '-c:a', 'mp2', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                'tmp.mkv']
         mock_subprocess.assert_called_with(cmd)
         mock_shutil.assert_called_with('tmp.mkv', 'b.mkv')
@@ -67,3 +67,20 @@ class TestMediaConverter(TestCase):
                'tmp.mkv']
         mock_subprocess.assert_called_with(cmd)
         mock_shutil.assert_called_with('tmp.mkv', 'b.mkv')
+
+    @mock.patch('shutil.move')
+    @mock.patch('media_converter.MediaConverter._new_tmp_filepath')
+    @mock.patch('subprocess.call')
+    def test_h265_with_ac3(self, mock_subprocess, mock_tmp_filepath, mock_shutil):
+        mock_tmp_filepath.return_value = 'tmp.mp4'
+
+        MediaConverter([VideoTrack('a.mkv', codecs.H265(constant_rate_factor=18, preset='slow')),
+                        AudioTrack('a.mkv', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
+
+        cmd = ['/usr/local/bin/ffmpeg', '-y',
+               '-i', 'a.mkv',
+               '-map', '0:v:0', '-c:v', 'libx265', '-preset', 'slow', '-x265-params', 'crf=18',
+               '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               'tmp.mp4']
+        mock_subprocess.assert_called_with(cmd)
+        mock_shutil.assert_called_with('tmp.mp4', 'b.mp4')

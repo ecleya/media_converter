@@ -1,5 +1,5 @@
-__all__ = ['VideoCodec', 'H264', 'MPEG2',
-           'AudioCodec', 'MP2', 'AAC', 'AC3', 'EAC3']
+__all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
+           'AudioCodec', 'MP2', 'AAC', 'AC3', 'MP2']
 
 
 class Codec:
@@ -70,12 +70,30 @@ class H264(VideoCodec):
         self._pixel_format = pixel_format
         self._profile = profile
         self._level = level
-        self._aspect_ratio = aspect_ratio
 
     def options_for_ffmpeg(self):
         options = ['-c:v', 'h264']
         options.extend(['-crf', self._constant_rate_factor] if self._bitrate is None else ['-b:v', self._bitrate])
         options.extend(['-pix_fmt', self._pixel_format, '-profile:v', self._profile, '-level', self._level])
+
+        if self._aspect_ratio is not None:
+            options.extend(['-aspect', str(self.aspect_ratio)])
+        if self._frame_rate is not None:
+            options.extend(['-r', str(self.frame_rate)])
+
+        return options
+
+
+class H265(VideoCodec):
+    def __init__(self, constant_rate_factor=23, preset='medium',
+                 aspect_ratio=None, frame_rate=None):
+        VideoCodec.__init__(self, None, aspect_ratio, frame_rate)
+
+        self._constant_rate_factor = str(constant_rate_factor)
+
+    def options_for_ffmpeg(self):
+        options = ['-c:v', 'libx265']
+        options.extend(['-preset', 'slow', '-x265-params', f'crf={self._constant_rate_factor}'])
 
         if self._aspect_ratio is not None:
             options.extend(['-aspect', str(self.aspect_ratio)])
@@ -111,15 +129,16 @@ class AC3(AudioCodec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
-
-class EAC3(AudioCodec):
-    def __init__(self, bitrate=None, channels=None, sampling_rate=None):
-        AudioCodec.__init__(self, bitrate, channels, sampling_rate)
+    def options_for_ffmpeg(self):
+        return ['-c:a', 'ac3', '-b:a', str(self.bitrate), '-ac', str(self.channels), '-ar', str(self.sampling_rate)]
 
 
 class MP2(AudioCodec):
     def __init__(self, bitrate=None, channels=None, sampling_rate=None):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
+
+    def options_for_ffmpeg(self):
+        return ['-c:a', 'mp2', '-b:a', str(self.bitrate), '-ac', str(self.channels), '-ar', str(self.sampling_rate)]
 
 
 class SRT(SubtitleCodec):
