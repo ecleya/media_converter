@@ -19,19 +19,25 @@ requirements = [
     'pyfileinfo',
 ]
 
+requirements = [
+    'chardet',
+    'pyfileinfo'
+]
 
 setup(
     name='media_converter',
     version=version(),
-    packages=find_packages(),
-    package_data={},
-    zip_safe=True,
-    install_requires=requirements,
     author='Kiheon Choi',
     author_email='ecleya' '@' 'smartstudy.co.kr',
-    maintainer='Kiheon Choi',
-    maintainer_email='ecleya' '@' 'smartstudy.co.kr',
+    maintainer='DevOps Team, SMARTSTUDY',
+    maintainer_email='d9@smartstudy.co.kr',
     url='https://github.com/smartstudy/media_converter',
-
+    packages=find_packages(exclude=['tests']),
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=requirements,
+    setup_requires=[
+        'pytest-runner'
+    ],
     description='Media Converter',
 )
