@@ -1,4 +1,4 @@
-__all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
+__all__ = ['VideoCodec', 'H264', 'MPEG2',
            'AudioCodec', 'MP2', 'AAC', 'AC3', 'EAC3']
 
 
@@ -65,8 +65,8 @@ class H264(VideoCodec):
                  aspect_ratio=None, frame_rate=None):
         VideoCodec.__init__(self, bitrate, aspect_ratio, frame_rate)
 
-        self._constant_rate_factor = constant_rate_factor
-        self._quantization_parameter = quantization_parameter
+        self._constant_rate_factor = str(constant_rate_factor)
+        self._quantization_parameter = str(quantization_parameter)
         self._pixel_format = pixel_format
         self._profile = profile
         self._level = level
@@ -74,7 +74,7 @@ class H264(VideoCodec):
 
     def options_for_ffmpeg(self):
         options = ['-c:v', 'h264']
-        options.extend(['-crf', str(self._constant_rate_factor)] if self._bitrate is None else ['-b:v', str(self._bitrate)])
+        options.extend(['-crf', self._constant_rate_factor] if self._bitrate is None else ['-b:v', self._bitrate])
         options.extend(['-pix_fmt', self._pixel_format, '-profile:v', self._profile, '-level', self._level])
 
         if self._aspect_ratio is not None:

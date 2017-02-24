@@ -13,7 +13,8 @@ class TestMediaConverter(TestCase):
         MediaConverter('a.mp4', 'b.mkv').convert()
 
         cmd = ['/usr/local/bin/ffmpeg', '-y', '-i', 'a.mp4',
-               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '3.1',
+               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
                'tmp.mkv']
         mock_subprocess.assert_called_with(cmd)
