@@ -75,7 +75,10 @@ class MediaConverter(TemporaryFileMixin):
 
     def _get_default_codecs(self):
         default_codecs = {
-            '.mkv': [H264, AAC]
+            '.mkv': [H264, AAC],
+            '.mp4': [H264, AAC],
+            '.m4v': [H264],
+            '.m4a': [AAC],
         }
 
         for codec in default_codecs[self._dst.extension.lower()]:
