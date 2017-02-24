@@ -13,14 +13,14 @@ Installation
 Examples
 --------
 
-.. code:: python
+.. code-block:: python
    >>> from media_converter import MediaConverter
    >>> MediaConverter('src.mkv', 'dst.mp4').convert()
 
 This will convert ``src.mkv`` to ``dst.mp4`` with default parameters for mp4.
 
 
-.. code::python
+.. code-block:: python
    >>> from media_converter import MediaConverter
    >>> from media_converter.tracks import AudioTrack
    >>> MediaConverter(AudioTrack('src.wav', codecs.AAC('192k', 2, 44100)), 'dst.m4a').convert()
@@ -28,7 +28,7 @@ This will convert ``src.mkv`` to ``dst.mp4`` with default parameters for mp4.
 This will convert PCM to AAC with 192k bitrates, 2 channels, 44100Hz. Of course simply ``MediaConverter('src.wav', dst.m4a').convert()`` will do the same.
 
 
-.. code::python
+.. code-block:: python
    >>> from media_converter import MediaConverter, codecs
    >>> from media_converter.tracks import VideoTrack, AudioTrack
    >>>
@@ -37,7 +37,7 @@ This will convert PCM to AAC with 192k bitrates, 2 channels, 44100Hz. Of course 
    ...                 'dst.mkv').convert()
 
 
-.. code::python
+.. code-block:: python
    >>> from media_converter import MediaConverter, codecs
    >>> from media_converter.tracks import VideoTrack, AudioTrack
    >>> from media_converter.streams import VideoOutstream
