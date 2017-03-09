@@ -89,3 +89,5 @@ _build
 # vagrant
 Vagrantfile
 .vagrant
+
+.eggs
