@@ -6,12 +6,12 @@ __all__ = ['Track', 'VideoTrack', 'AudioTrack']
 
 
 class Track:
-    def __init__(self, outstream, codec):
+    def __init__(self, outstream, codec, **kwargs):
         if not isinstance(outstream, Outstream):
             if isinstance(codec, VideoCodec):
-                outstream = VideoOutstream(outstream)
+                outstream = VideoOutstream(outstream, **kwargs)
             elif isinstance(codec, AudioCodec):
-                outstream = AudioOutstream(outstream)
+                outstream = AudioOutstream(outstream, **kwargs)
 
         self._outstream = outstream
         self._codec = codec

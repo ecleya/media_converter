@@ -29,6 +29,13 @@ This will convert PCM to AAC with 192k bitrates, 2 channels, 44100Hz. Of course 
 
 
 .. code-block:: python
+   >>> from media_converter import MediaConverter
+   >>> MediaConverter([AudioTrack(None, codecs.AAC('256k', 2, 48000))], 'dst.m4a').convert(duration=10)
+
+This will generate silent audio for 10 seconds.
+
+
+.. code-block:: python
    >>> from media_converter import MediaConverter, codecs
    >>> from media_converter.tracks import VideoTrack, AudioTrack
    >>>

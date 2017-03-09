@@ -12,7 +12,7 @@ class Outstream:
 
 class VideoOutstream(Outstream):
     def __init__(self, instream):
-        Outstream.__init__(self, instream if isinstance(instream, Instream) else VideoInstream(instream))
+        Outstream.__init__(self, instream if isinstance(instream, Instream) else VideoInstream.factory(instream))
 
         self._filters = []
 
@@ -39,7 +39,7 @@ class VideoOutstream(Outstream):
 
 class AudioOutstream(Outstream):
     def __init__(self, instream):
-        Outstream.__init__(self, instream if isinstance(instream, Instream) else AudioInstream(instream))
+        Outstream.__init__(self, instream if isinstance(instream, Instream) else AudioInstream.factory(instream))
 
         self._filters = []
 
