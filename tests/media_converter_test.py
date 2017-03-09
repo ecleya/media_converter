@@ -121,3 +121,24 @@ class TestMediaConverter(TestCase):
                'tmp.mp4']
         mock_subprocess.assert_called_with(cmd)
         mock_shutil.assert_called_with('tmp.mp4', 'b.mp4')
+
+    @mock.patch('shutil.move')
+    @mock.patch('media_converter.MediaConverter._new_tmp_filepath')
+    @mock.patch('subprocess.call')
+    @mock.patch('media_converter.streams.instream.ImageInstream.is_valid')
+    def test_image_video_with_audio(self, mock_valid, mock_subprocess, mock_tmp_filepath, mock_shutil):
+        mock_valid.return_value = True
+        mock_tmp_filepath.return_value = 'tmp.mp4'
+
+        MediaConverter([VideoTrack('a.png', codecs.H264()),
+                        AudioTrack('a.mp3', codecs.AAC())], 'b.mp4').convert()
+
+        cmd = ['/usr/local/bin/ffmpeg', '-y',
+               '-i', 'a.png',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
+               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1',
+               '-map', '1:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               'tmp.mp4']
+        mock_subprocess.assert_called_with(cmd)
+        mock_shutil.assert_called_with('tmp.mp4', 'b.mp4')
