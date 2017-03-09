@@ -136,3 +136,12 @@ class SilentAudioInstream(AudioInstream):
     def as_ffmpeg_instream(self):
         options = [] if self._duration is None else ['-t', str(self.duration)]
         return options + ['-ar', '48000', '-ac', '1', '-f', 's16le',  '-i', self.file_path]
+
+
+class SubtitleInstream(Instream):
+    def __init__(self, file_path, track_index=0):
+        Instream.__init__(self, file_path, 's', track_index)
+
+    @staticmethod
+    def factory(file_path):
+        return SubtitleInstream(file_path, 0)

@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from media_converter import MediaConverter, codecs
-from media_converter.tracks import VideoTrack, AudioTrack
+from media_converter.tracks import VideoTrack, AudioTrack, SubtitleTrack
 from media_converter.streams import VideoOutstream
 
 
@@ -142,3 +142,22 @@ class TestMediaConverter(TestCase):
                'tmp.mp4']
         mock_subprocess.assert_called_with(cmd)
         mock_shutil.assert_called_with('tmp.mp4', 'b.mp4')
+
+    @mock.patch('shutil.move')
+    @mock.patch('media_converter.MediaConverter._new_tmp_filepath')
+    @mock.patch('subprocess.call')
+    def test_copy(self, mock_subprocess, mock_tmp_filepath, mock_shutil):
+        mock_tmp_filepath.return_value = 'tmp.mkv'
+
+        MediaConverter([VideoTrack('a.mkv', codecs.Copy()),
+                        AudioTrack('a.mkv', codecs.Copy()),
+                        SubtitleTrack('a.mkv', codecs.Copy())], 'b.mkv').convert()
+
+        cmd = ['/usr/local/bin/ffmpeg', '-y',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
+               '-map', '0:v:0', '-c:v', 'copy',
+               '-map', '0:a:0', '-c:a', 'copy',
+               '-map', '0:s:0', '-c:s', 'copy',
+               'tmp.mkv']
+        mock_subprocess.assert_called_with(cmd)
+        mock_shutil.assert_called_with('tmp.mkv', 'b.mkv')

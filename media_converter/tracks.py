@@ -1,5 +1,5 @@
-from media_converter.codecs import VideoCodec, AudioCodec
-from media_converter.streams import VideoOutstream, AudioOutstream, Outstream
+from media_converter.codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
+from media_converter.streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
 
 
 __all__ = ['Track', 'VideoTrack', 'AudioTrack']
@@ -7,12 +7,6 @@ __all__ = ['Track', 'VideoTrack', 'AudioTrack']
 
 class Track:
     def __init__(self, outstream, codec, **kwargs):
-        if not isinstance(outstream, Outstream):
-            if isinstance(codec, VideoCodec):
-                outstream = VideoOutstream(outstream, **kwargs)
-            elif isinstance(codec, AudioCodec):
-                outstream = AudioOutstream(outstream, **kwargs)
-
         self._outstream = outstream
         self._codec = codec
 
@@ -26,8 +20,31 @@ class Track:
 
 
 class VideoTrack(Track):
-    pass
+    def __init__(self, outstream, codec, **kwargs):
+        if not isinstance(outstream, Outstream):
+            outstream = VideoOutstream(outstream, **kwargs)
+        if isinstance(codec, Copy):
+            codec = VideoCopy()
+
+        Track.__init__(self, outstream, codec, **kwargs)
 
 
 class AudioTrack(Track):
-    pass
+    def __init__(self, outstream, codec, **kwargs):
+        if not isinstance(outstream, Outstream):
+            outstream = AudioOutstream(outstream, **kwargs)
+        if isinstance(codec, Copy):
+            codec = AudioCopy()
+
+        Track.__init__(self, outstream, codec, **kwargs)
+
+
+class SubtitleTrack(Track):
+    def __init__(self, outstream, codec, **kwargs):
+        if not isinstance(outstream, Outstream):
+            outstream = SubtitleOutstream(outstream, **kwargs)
+        if isinstance(codec, Copy):
+            codec = SubtitleCopy()
+
+        Track.__init__(self, outstream, codec, **kwargs)
+

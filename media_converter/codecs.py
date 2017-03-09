@@ -1,5 +1,7 @@
 __all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
-           'AudioCodec', 'MP2', 'AAC', 'AC3', 'MP2']
+           'AudioCodec', 'MP2', 'AAC', 'AC3', 'MP2',
+           'SubtitleCodec', 'SRT',
+           'Copy']
 
 
 class Codec:
@@ -144,3 +146,22 @@ class MP2(AudioCodec):
 class SRT(SubtitleCodec):
     def __init__(self):
         super(SRT, self).__init__()
+
+
+class Copy(Codec):
+    pass
+
+
+class VideoCopy(VideoCodec):
+    def options_for_ffmpeg(self):
+        return ['-c:v', 'copy']
+
+
+class AudioCopy(AudioCodec):
+    def options_for_ffmpeg(self):
+        return ['-c:a', 'copy']
+
+
+class SubtitleCopy(SubtitleCodec):
+    def options_for_ffmpeg(self):
+        return ['-c:s', 'copy']

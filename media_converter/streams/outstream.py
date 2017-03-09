@@ -1,4 +1,4 @@
-from media_converter.streams.instream import Instream, VideoInstream, AudioInstream
+from media_converter.streams.instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
 
 
 class Outstream:
@@ -40,6 +40,16 @@ class VideoOutstream(Outstream):
 class AudioOutstream(Outstream):
     def __init__(self, instream):
         Outstream.__init__(self, instream if isinstance(instream, Instream) else AudioInstream.factory(instream))
+
+        self._filters = []
+
+    def filter_options_for_ffmpeg(self, infile_index):
+        return ''
+
+
+class SubtitleOutstream(Outstream):
+    def __init__(self, instream):
+        Outstream.__init__(self, instream if isinstance(instream, Instream) else SubtitleInstream.factory(instream))
 
         self._filters = []
 

@@ -62,3 +62,12 @@ and more.
    >>> vos = VideoOutstream('src.mp4').scale(height=480)
    >>> MediaConverter([VideoTrack(vos, codecs.MPEG2('3000k', '16:9', '23.97')),
    ...                 AudioTrack('src.mp4', codecs.AAC('256k', 2, 44100))], 'dst.mkv').convert()
+
+
+.. code-block:: python
+   >>> from media_converter import MediaConverter, codecs
+   >>> from media_converter.tracks import VideoTrack, AudioTrack
+   >>>
+   >>> MediaConverter([VideoTrack('src1.mp4', codecs.Copy()),
+   ...                 AudioTrack('src2.mp4', codecs.Copy())],
+   ...                 'dst.mkv').convert()
