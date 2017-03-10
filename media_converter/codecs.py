@@ -119,6 +119,14 @@ class MPEG2(VideoCodec):
         return options
 
 
+class PNGSequence(VideoCodec):
+    def __init__(self):
+        VideoCodec.__init__(self, None, None, None)
+
+    def options_for_ffmpeg(self):
+        return ['-f', 'image2', '-pix_fmt', 'rgb32']
+
+
 class AAC(AudioCodec):
     def __init__(self, bitrate='192k', channels='2', sampling_rate='44100'):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
