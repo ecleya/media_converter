@@ -2,7 +2,7 @@ from media_converter.codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
 from media_converter.streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
 
 
-__all__ = ['Track', 'VideoTrack', 'AudioTrack']
+__all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']
 
 
 class Track:
