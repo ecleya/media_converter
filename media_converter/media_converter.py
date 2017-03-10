@@ -51,24 +51,41 @@ class MediaConverter:
 
     def _append_instreams(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            if instream.as_ffmpeg_instream() in self._infiles:
-                continue
+            for instream in track.outstream.instreams:
+                if instream.as_ffmpeg_instream() in self._infiles:
+                    continue
 
-            self._infiles.append(instream.as_ffmpeg_instream())
-            self._command.extend(instream.as_ffmpeg_instream())
+                self._infiles.append(instream.as_ffmpeg_instream())
+                self._command.extend(instream.as_ffmpeg_instream())
 
     def _append_tracks(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            infile_index = self._infiles.index(instream.as_ffmpeg_instream())
-            filter = track.outstream.filter_options_for_ffmpeg(infile_index)
-            if len(filter) == 0:
-                self._command.extend(['-map', f'{infile_index}:{instream.track_type}:{instream.track_index}'])
-            else:
-                self._command.extend(['-filter_complex', filter, '-map', '[vout0]'])
-
+            self._append_outstream_options_with_filter(track.outstream)
             self._command.extend(track.codec.options_for_ffmpeg())
+
+    def _append_outstream_options_with_filter(self, outstream):
+        idx = 0
+        instream = outstream.instreams[0]
+        infile_index = self._infiles.index(instream.as_ffmpeg_instream())
+        instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
+        outstream_id = f'[vout{idx}]'
+        filters = []
+
+        for instream, filter_option in outstream.filters:
+            if instream is None:
+                filters.append(f'{instream_id}{filter_option}{outstream_id}')
+            else:
+                infile_index = self._infiles.index(instream.as_ffmpeg_instream())
+                additional_instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
+                filters.append(f'{instream_id}{additional_instream_id}{filter_option}{outstream_id}')
+            instream_id = outstream_id
+            idx += 1
+            outstream_id = f'[vout{idx}]'
+
+        if len(filters) == 0:
+            self._command.extend(['-map', f'{infile_index}:{instream.track_type}:{instream.track_index}'])
+        else:
+            self._command.extend(['-filter_complex', ';'.join(filters), '-map', instream_id])
 
     def _append_time_options(self):
         options = []
@@ -87,9 +104,9 @@ class MediaConverter:
 
     def _has_not_timed_blank_instream(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            if instream.is_blank() and instream.duration is None:
-                return True
+            for instream in track.outstream.instreams:
+                if instream.is_blank() and instream.duration is None:
+                    return True
 
         return False
 
