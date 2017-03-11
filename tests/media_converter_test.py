@@ -14,7 +14,7 @@ class TestMediaConverter(TestCase):
                '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
-               'b.mkv']
+               '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -24,7 +24,7 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.wav',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
-               'a.m4a']
+               '-threads', '0', 'a.m4a']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -36,7 +36,7 @@ class TestMediaConverter(TestCase):
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
                '-map', '0:a:0', '-c:a', 'mp2', '-b:a', '256k', '-ac', '2', '-ar', '44100',
-               'b.mkv']
+               '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -50,7 +50,7 @@ class TestMediaConverter(TestCase):
                '-filter_complex', '[0:v:0]scale=-2:480[vout0]',
                '-map', '[vout0]', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
-               'b.mkv']
+               '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -62,7 +62,7 @@ class TestMediaConverter(TestCase):
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
                '-map', '0:v:0', '-c:v', 'libx265', '-preset', 'slow', '-x265-params', 'crf=18',
                '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -72,7 +72,7 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-ar', '48000', '-ac', '1', '-f', 's16le', '-i', '/dev/zero',
                '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '48000', '-t', '10',
-               'b.m4a']
+               '-threads', '0', 'b.m4a']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -87,7 +87,7 @@ class TestMediaConverter(TestCase):
                '-profile:v', 'high', '-level', '3.1',
                '-map', '1:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
                '-shortest',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -103,7 +103,7 @@ class TestMediaConverter(TestCase):
                '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '1:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -117,7 +117,7 @@ class TestMediaConverter(TestCase):
                '-map', '0:v:0', '-c:v', 'copy',
                '-map', '0:a:0', '-c:a', 'copy',
                '-map', '0:s:0', '-c:s', 'copy',
-               'b.mkv']
+               '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -132,7 +132,7 @@ class TestMediaConverter(TestCase):
                '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '1:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -147,7 +147,7 @@ class TestMediaConverter(TestCase):
                '-map', '[vout1]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -166,7 +166,7 @@ class TestMediaConverter(TestCase):
                '-map', '[vout0]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
@@ -185,5 +185,5 @@ class TestMediaConverter(TestCase):
                '-map', '[vout0]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               'b.mp4']
+               '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)

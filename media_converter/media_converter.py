@@ -111,7 +111,7 @@ class MediaConverter:
         return False
 
     def _append_dst(self):
-        self._command.append(self._dst.path)
+        self._command.extend(['-threads', '0', self._dst.path])
 
     def _get_default_codecs(self):
         default_codecs = {
