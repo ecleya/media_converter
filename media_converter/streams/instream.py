@@ -2,10 +2,11 @@ from pyfileinfo import PyFileInfo
 
 
 class Instream:
-    def __init__(self, file_path, track_type, track_index):
+    def __init__(self, file_path, track_type, track_index, start_at=None):
         self._file_path = file_path
         self._track_type = track_type
         self._track_index = track_index
+        self._start_at = start_at
 
     @property
     def file_path(self):
@@ -19,16 +20,24 @@ class Instream:
     def track_index(self):
         return self._track_index
 
+    @property
+    def start_at(self):
+        return self._start_at
+
     def is_blank(self):
         return False
 
     def as_ffmpeg_instream(self):
-        return ['-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', self._file_path]
+        options = ['-analyzeduration', '2147483647', '-probesize', '2147483647']
+        if self._start_at is not None:
+            options += ['-ss', str(self.start_at)]
+
+        return options + ['-i', self._file_path]
 
 
 class VideoInstream(Instream):
-    def __init__(self, file_path, track_index=0):
-        Instream.__init__(self, file_path, 'v', track_index)
+    def __init__(self, file_path, track_index=0, start_at=None):
+        Instream.__init__(self, file_path, 'v', track_index, start_at)
 
     @staticmethod
     def factory(file_path):
@@ -45,8 +54,8 @@ class VideoInstream(Instream):
 
 
 class ImageSequenceInstream(VideoInstream):
-    def __init__(self, image_seq_pattern, frame_rate=30):
-        VideoInstream.__init__(self, image_seq_pattern, 0)
+    def __init__(self, image_seq_pattern, frame_rate=30, start_at=None):
+        VideoInstream.__init__(self, image_seq_pattern, 0, start_at)
 
         self._image_seq_pattern = image_seq_pattern
         self._frame_rate = frame_rate
@@ -63,7 +72,9 @@ class ImageSequenceInstream(VideoInstream):
             return False
 
     def as_ffmpeg_instream(self):
-        return ['-r', str(self._frame_rate), '-vsync', '1', '-f', 'image2', '-i', self._image_seq_pattern]
+        options = [] if self._start_at is None else ['-ss', str(self.start_at)]
+
+        return options + ['-r', str(self._frame_rate), '-vsync', '1', '-f', 'image2', '-i', self._image_seq_pattern]
 
 
 class ImageInstream(VideoInstream):
@@ -99,14 +110,19 @@ class BlackVideoInstream(VideoInstream):
         return True
 
     def as_ffmpeg_instream(self):
-        options = [] if self._duration is None else ['-t', str(self.duration)]
-        return options + ['-s', f'{self._width}x{self._height}', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
-                          '-r', str(self._frame_rate), '-i', self.file_path]
+        options = ['-s', f'{self._width}x{self._height}', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+                   '-r', str(self._frame_rate)]
+        if self._start_at is not None:
+            options += ['-ss', str(self.duration)]
+        if self._duration is not None:
+            options += ['-t', str(self.duration)]
+
+        return options + ['-i', self.file_path]
 
 
 class AudioInstream(Instream):
-    def __init__(self, file_path, track_index=0):
-        Instream.__init__(self, file_path, 'a', track_index)
+    def __init__(self, file_path, track_index=0, start_at=None):
+        Instream.__init__(self, file_path, 'a', track_index, start_at)
 
     @staticmethod
     def factory(file_path):
@@ -134,13 +150,16 @@ class SilentAudioInstream(AudioInstream):
         return True
 
     def as_ffmpeg_instream(self):
-        options = [] if self._duration is None else ['-t', str(self.duration)]
-        return options + ['-ar', '48000', '-ac', '1', '-f', 's16le',  '-i', self.file_path]
+        options = ['-ar', '48000', '-ac', '1', '-f', 's16le']
+        if self._duration is not None:
+            options += ['-t', str(self.duration)]
+
+        return options + ['-i', self.file_path]
 
 
 class SubtitleInstream(Instream):
-    def __init__(self, file_path, track_index=0):
-        Instream.__init__(self, file_path, 's', track_index)
+    def __init__(self, file_path, track_index=0, start_at=None):
+        Instream.__init__(self, file_path, 's', track_index, start_at)
 
     @staticmethod
     def factory(file_path):

@@ -3,11 +3,16 @@ from media_converter.streams.instream import Instream, VideoInstream, AudioInstr
 
 class Outstream:
     def __init__(self, instream):
-        self._instream = instream
+        self._instreams = [instream]
+        self._filters = []
 
     @property
-    def instream(self):
-        return self._instream
+    def instreams(self):
+        return self._instreams
+
+    @property
+    def filters(self):
+        return self._filters
 
 
 class VideoOutstream(Outstream):
@@ -22,19 +27,28 @@ class VideoOutstream(Outstream):
         if height is None:
             height = -2
 
-        self._filters.append(f'scale={width}:{height}')
+        self._filters.append((None, f'scale={width}:{height}'))
         return self
 
-    def filter_options_for_ffmpeg(self, infile_index):
-        instream = f'[{infile_index}:{self._instream.track_type}:{self._instream.track_index}]'
-        outstream = '[vout0]'
-        filters = []
-        for filter in self._filters:
-            filters.append(f'{instream}{filter}{outstream}')
-            instream = outstream
-            outstream = '[vout1]'
+    def deinterlace(self):
+        self._filters.append((None, 'yadif'))
+        return self
 
-        return ';'.join(filters)
+    def deinterlace_slow(self):
+        self._filters.append((None, 'yadif=3'))
+        self._filters.append((None, 'mcdeint=2:1:10'))
+        return self
+
+    def overlay(self, instream, x=0, y=0):
+        instream = instream if isinstance(instream, Instream) else VideoInstream.factory(instream)
+        self._instreams.append(instream)
+
+        self._filters.append((instream, f'overlay={x}:{y}'))
+        return self
+
+    def crop(self, area):
+        self._filters.append((None, f'crop={area}'))
+        return self
 
 
 class AudioOutstream(Outstream):
@@ -43,15 +57,9 @@ class AudioOutstream(Outstream):
 
         self._filters = []
 
-    def filter_options_for_ffmpeg(self, infile_index):
-        return ''
-
 
 class SubtitleOutstream(Outstream):
     def __init__(self, instream):
         Outstream.__init__(self, instream if isinstance(instream, Instream) else SubtitleInstream.factory(instream))
 
         self._filters = []
-
-    def filter_options_for_ffmpeg(self, infile_index):
-        return ''

@@ -1,15 +1,11 @@
-import shutil
 import subprocess
 from pyfileinfo import PyFileInfo
 from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
 from media_converter.tracks import Track, AudioTrack, VideoTrack
-from media_converter.mixins import TemporaryFileMixin
 
 
-class MediaConverter(TemporaryFileMixin):
+class MediaConverter:
     def __init__(self, tracks, dst):
-        TemporaryFileMixin.__init__(self)
-
         if not isinstance(tracks, list):
             tracks = [tracks]
 
@@ -28,7 +24,6 @@ class MediaConverter(TemporaryFileMixin):
         self._create_command()
 
         subprocess.call(self._command)
-        shutil.move(self._command[-1], self._dst.path)
 
     @property
     def tracks(self):
@@ -56,24 +51,41 @@ class MediaConverter(TemporaryFileMixin):
 
     def _append_instreams(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            if instream.as_ffmpeg_instream() in self._infiles:
-                continue
+            for instream in track.outstream.instreams:
+                if instream.as_ffmpeg_instream() in self._infiles:
+                    continue
 
-            self._infiles.append(instream.as_ffmpeg_instream())
-            self._command.extend(instream.as_ffmpeg_instream())
+                self._infiles.append(instream.as_ffmpeg_instream())
+                self._command.extend(instream.as_ffmpeg_instream())
 
     def _append_tracks(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            infile_index = self._infiles.index(instream.as_ffmpeg_instream())
-            filter = track.outstream.filter_options_for_ffmpeg(infile_index)
-            if len(filter) == 0:
-                self._command.extend(['-map', f'{infile_index}:{instream.track_type}:{instream.track_index}'])
-            else:
-                self._command.extend(['-filter_complex', filter, '-map', '[vout0]'])
-
+            self._append_outstream_options_with_filter(track.outstream)
             self._command.extend(track.codec.options_for_ffmpeg())
+
+    def _append_outstream_options_with_filter(self, outstream):
+        idx = 0
+        instream = outstream.instreams[0]
+        infile_index = self._infiles.index(instream.as_ffmpeg_instream())
+        instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
+        outstream_id = f'[vout{idx}]'
+        filters = []
+
+        for instream, filter_option in outstream.filters:
+            if instream is None:
+                filters.append(f'{instream_id}{filter_option}{outstream_id}')
+            else:
+                infile_index = self._infiles.index(instream.as_ffmpeg_instream())
+                additional_instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
+                filters.append(f'{instream_id}{additional_instream_id}{filter_option}{outstream_id}')
+            instream_id = outstream_id
+            idx += 1
+            outstream_id = f'[vout{idx}]'
+
+        if len(filters) == 0:
+            self._command.extend(['-map', f'{infile_index}:{instream.track_type}:{instream.track_index}'])
+        else:
+            self._command.extend(['-filter_complex', ';'.join(filters), '-map', instream_id])
 
     def _append_time_options(self):
         options = []
@@ -92,14 +104,14 @@ class MediaConverter(TemporaryFileMixin):
 
     def _has_not_timed_blank_instream(self):
         for track in self.tracks:
-            instream = track.outstream.instream
-            if instream.is_blank() and instream.duration is None:
-                return True
+            for instream in track.outstream.instreams:
+                if instream.is_blank() and instream.duration is None:
+                    return True
 
         return False
 
     def _append_dst(self):
-        self._command.append(self._new_tmp_filepath(self._dst.extension))
+        self._command.extend(['-threads', '0', self._dst.path])
 
     def _get_default_codecs(self):
         default_codecs = {
