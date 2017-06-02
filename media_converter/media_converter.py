@@ -1,7 +1,7 @@
 import subprocess
 from pyfileinfo import PyFileInfo
 from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
-from media_converter.tracks import Track, AudioTrack, VideoTrack
+from media_converter.tracks import Track, AudioTrack, VideoTrack, SubtitleTrack
 
 
 class MediaConverter:
@@ -42,6 +42,7 @@ class MediaConverter:
         self._init_command()
         self._append_instreams()
         self._append_tracks()
+        self._append_metadata()
         self._append_time_options()
         self._append_dst()
 
@@ -61,7 +62,63 @@ class MediaConverter:
     def _append_tracks(self):
         for track in self.tracks:
             self._append_outstream_options_with_filter(track.outstream)
-            self._command.extend(track.codec.options_for_ffmpeg())
+            self._command.extend(track.codec.options_for_ffmpeg(self._get_track_index(track)))
+
+    def _get_track_index(self, target_track):
+        index = 0
+        for track in self._tracks:
+            if track == target_track:
+                break
+
+            if type(track) is type(target_track):
+                index += 1
+
+        return index
+
+    def _append_metadata(self):
+        self._append_default_info('v', self.video_tracks)
+        self._append_default_info('a', self.audio_tracks)
+        self._append_default_info('s', self.subtitle_tracks)
+
+        self._append_language_info('v', self.video_tracks)
+        self._append_language_info('a', self.audio_tracks)
+        self._append_language_info('s', self.subtitle_tracks)
+
+    def _append_default_info(self, identifier, tracks):
+        has_default_track = any([track.default for track in tracks])
+        is_default = not has_default_track
+        track_index = 0
+        for track in tracks:
+            self._command.extend([f'-disposition:{identifier}:{track_index}',
+                                  'default' if is_default or track.default else '0'])
+            is_default = False
+            track_index += 1
+
+    def _append_language_info(self, identifier, tracks):
+        track_index = 0
+        for track in tracks:
+            if track.language is not None:
+                self._command.extend([f'-metadata:s:{identifier}:{track_index}', track.language])
+
+            track_index += 1
+
+    @property
+    def video_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, VideoTrack):
+                yield track
+
+    @property
+    def audio_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, AudioTrack):
+                yield track
+
+    @property
+    def subtitle_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, SubtitleTrack):
+                yield track
 
     def _append_outstream_options_with_filter(self, outstream):
         idx = 0
