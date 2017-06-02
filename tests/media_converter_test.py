@@ -195,3 +195,31 @@ class TestMediaConverter(TestCase):
                '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
+
+    @mock.patch('subprocess.call')
+    def test_subtitle_language(self, mock_subprocess):
+        MediaConverter([VideoTrack('a.mp4', codecs.H264()),
+                        AudioTrack('a.mp4', codecs.AAC()),
+                        SubtitleTrack('a.srt', codecs.TimedText(), language='kor')], 'b.mp4').convert()
+
+        cmd = ['/somewhere/ffmpeg', '-y',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.srt',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               '-map', '1:s:0', '-c:s:0', 'mov_text',
+               '-metadata:s:s:0', 'language=kor',
+               '-threads', '0', 'b.mp4']
+        mock_subprocess.assert_called_with(cmd)
+
+    @mock.patch('subprocess.call')
+    def test_frame_rate(self, mock_subprocess):
+        MediaConverter([VideoTrack('a.mp4', codecs.H264(frame_rate=30))], 'b.mp4').convert()
+
+        cmd = ['/somewhere/ffmpeg', '-y',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1', '-r', '30',
+               '-threads', '0', 'b.mp4']
+        mock_subprocess.assert_called_with(cmd)

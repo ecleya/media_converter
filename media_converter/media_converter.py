@@ -99,7 +99,7 @@ class MediaConverter:
         track_index = 0
         for track in tracks:
             if track.language is not None:
-                self._command.extend([f'-metadata:s:{identifier}:{track_index}', track.language])
+                self._command.extend([f'-metadata:s:{identifier}:{track_index}', f'language={track.language}'])
 
             track_index += 1
 
