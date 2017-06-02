@@ -42,7 +42,7 @@ class MediaConverter:
         self._init_command()
         self._append_instreams()
         self._append_tracks()
-        self._append_defaults()
+        self._append_metadata()
         self._append_time_options()
         self._append_dst()
 
@@ -75,29 +75,31 @@ class MediaConverter:
 
         return index
 
-    def _append_defaults(self):
-        has_default_track = any([track.default for track in self.video_tracks])
+    def _append_metadata(self):
+        self._append_default_info('v', self.video_tracks)
+        self._append_default_info('a', self.audio_tracks)
+        self._append_default_info('s', self.subtitle_tracks)
+
+        self._append_language_info('v', self.video_tracks)
+        self._append_language_info('a', self.audio_tracks)
+        self._append_language_info('s', self.subtitle_tracks)
+
+    def _append_default_info(self, identifier, tracks):
+        has_default_track = any([track.default for track in tracks])
         is_default = not has_default_track
         track_index = 0
-        for track in self.video_tracks:
-            self._command.extend([f'-disposition:v:{track_index}', 'default' if is_default or track.default else '0'])
+        for track in tracks:
+            self._command.extend([f'-disposition:{identifier}:{track_index}',
+                                  'default' if is_default or track.default else '0'])
             is_default = False
             track_index += 1
 
-        has_default_track = any([track.default for track in self.audio_tracks])
-        is_default = not has_default_track
+    def _append_language_info(self, identifier, tracks):
         track_index = 0
-        for track in self.audio_tracks:
-            self._command.extend([f'-disposition:a:{track_index}', 'default' if is_default or track.default else '0'])
-            is_default = False
-            track_index += 1
+        for track in tracks:
+            if track.language is not None:
+                self._command.extend([f'-metadata:s:{identifier}:{track_index}', track.language])
 
-        has_default_track = any([track.default for track in self.subtitle_tracks])
-        is_default = not has_default_track
-        track_index = 0
-        for track in self.subtitle_tracks:
-            self._command.extend([f'-disposition:s:{track_index}', 'default' if is_default or track.default else '0'])
-            is_default = False
             track_index += 1
 
     @property
