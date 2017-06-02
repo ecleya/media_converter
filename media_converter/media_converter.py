@@ -75,6 +75,31 @@ class MediaConverter:
 
         return index
 
+    def _append_defaults(self):
+        has_default_track = any([track.default for track in self.video_tracks])
+        is_default = not has_default_track
+        track_index = 0
+        for track in self.video_tracks:
+            self._command.extend([f'-disposition:v:{track_index}', 'default' if is_default or track.default else '0'])
+            is_default = False
+            track_index += 1
+
+        has_default_track = any([track.default for track in self.audio_tracks])
+        is_default = not has_default_track
+        track_index = 0
+        for track in self.audio_tracks:
+            self._command.extend([f'-disposition:a:{track_index}', 'default' if is_default or track.default else '0'])
+            is_default = False
+            track_index += 1
+
+        has_default_track = any([track.default for track in self.subtitle_tracks])
+        is_default = not has_default_track
+        track_index = 0
+        for track in self.subtitle_tracks:
+            self._command.extend([f'-disposition:s:{track_index}', 'default' if is_default or track.default else '0'])
+            is_default = False
+            track_index += 1
+
     @property
     def video_tracks(self):
         for track in self.tracks:
