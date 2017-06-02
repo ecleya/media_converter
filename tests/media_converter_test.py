@@ -5,11 +5,19 @@ from media_converter.streams import VideoOutstream, AudioInstream
 
 
 class TestMediaConverter(TestCase):
+    def setUp(self):
+        self._which_patcher = mock.patch('media_converter.media_converter._which')
+        self._mock_which = self._which_patcher.start()
+        self._mock_which.return_value = '/somewhere/ffmpeg'
+
+    def tearDown(self):
+        self._which_patcher.stop()
+
     @mock.patch('subprocess.call')
     def test_simple_convert(self, mock_subprocess):
         MediaConverter('a.mp4', 'b.mkv').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
@@ -21,7 +29,7 @@ class TestMediaConverter(TestCase):
     def test_audio_convert(self, mock_subprocess):
         MediaConverter(AudioTrack('a.wav', codecs.AAC('256k', 2, 44100)), 'a.m4a').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.wav',
                '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'a.m4a']
@@ -32,7 +40,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack('a.mp4', codecs.MPEG2('3000k', '16:9', '23.97')),
                         AudioTrack('a.mp4', codecs.MP2('256k', 2, 44100))], 'b.mkv').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-map', '0:v:0', '-c:v:0', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
                '-map', '0:a:0', '-c:a:0', 'mp2', '-b:a', '256k', '-ac', '2', '-ar', '44100',
@@ -45,7 +53,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack(vos, codecs.MPEG2('3000k', '16:9', '23.97')),
                         AudioTrack('a.mp4', codecs.AAC('256k', 2, 44100))], 'b.mkv').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-filter_complex', '[0:v:0]scale=-2:480[vout0]',
                '-map', '[vout0]', '-c:v:0', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
@@ -58,7 +66,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack('a.mkv', codecs.H265(constant_rate_factor=18, preset='slow')),
                         AudioTrack('a.mkv', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
                '-map', '0:v:0', '-c:v:0', 'libx265', '-preset', 'slow', '-x265-params', 'crf=18',
                '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
@@ -69,7 +77,7 @@ class TestMediaConverter(TestCase):
     def test_silent_audio_for_10_secs(self, mock_subprocess):
         MediaConverter([AudioTrack(None, codecs.AAC('256k', 2, 48000))], 'b.m4a').convert(duration=10)
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-ar', '48000', '-ac', '1', '-f', 's16le', '-i', '/dev/zero',
                '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '48000', '-t', '10',
                '-threads', '0', 'b.m4a']
@@ -80,7 +88,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack(None, codecs.H264()),
                         AudioTrack('a.mp3', codecs.AAC())], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-s', '640x360', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-r', '30', '-i', '/dev/zero',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
                '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
@@ -97,7 +105,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack('a.png', codecs.H264()),
                         AudioTrack('a.mp3', codecs.AAC())], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-i', 'a.png',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
                '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
@@ -112,7 +120,7 @@ class TestMediaConverter(TestCase):
                         AudioTrack('a.mkv', codecs.Copy()),
                         SubtitleTrack('a.mkv', codecs.Copy())], 'b.mkv').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
                '-map', '0:v:0', '-c:v:0', 'copy',
                '-map', '0:a:0', '-c:a:0', 'copy',
@@ -126,7 +134,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack('a.mkv', codecs.H264()),
                         AudioTrack(delayed_instream, codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-ss', '5', '-i', 'a.mkv',
                '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
@@ -141,7 +149,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack(vos, codecs.H264()),
                         AudioTrack('a.mp4', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-filter_complex', '[0:v:0]yadif[vout0];[vout0]scale=1920:-2[vout1]',
                '-map', '[vout1]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
@@ -159,7 +167,7 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack(vos, codecs.H264()),
                         AudioTrack('a.mp4', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-i', 'a.png',
                '-filter_complex', '[0:v:0][1:v:0]overlay=0:0[vout0]',
@@ -178,12 +186,40 @@ class TestMediaConverter(TestCase):
         MediaConverter([VideoTrack(vos, codecs.H264()),
                         AudioTrack('a.mp4', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
 
-        cmd = ['/usr/local/bin/ffmpeg', '-y',
+        cmd = ['/somewhere/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-i', 'a.png',
                '-filter_complex', '[0:v:0][1:v:0]overlay=30:70[vout0]',
                '-map', '[vout0]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-threads', '0', 'b.mp4']
+        mock_subprocess.assert_called_with(cmd)
+
+    @mock.patch('subprocess.call')
+    def test_subtitle_language(self, mock_subprocess):
+        MediaConverter([VideoTrack('a.mp4', codecs.H264()),
+                        AudioTrack('a.mp4', codecs.AAC()),
+                        SubtitleTrack('a.srt', codecs.TimedText(), language='kor')], 'b.mp4').convert()
+
+        cmd = ['/somewhere/ffmpeg', '-y',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.srt',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               '-map', '1:s:0', '-c:s:0', 'mov_text',
+               '-metadata:s:s:0', 'language=kor',
+               '-threads', '0', 'b.mp4']
+        mock_subprocess.assert_called_with(cmd)
+
+    @mock.patch('subprocess.call')
+    def test_frame_rate(self, mock_subprocess):
+        MediaConverter([VideoTrack('a.mp4', codecs.H264(frame_rate=30))], 'b.mp4').convert()
+
+        cmd = ['/somewhere/ffmpeg', '-y',
+               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-profile:v', 'high', '-level', '3.1', '-r', '30',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)

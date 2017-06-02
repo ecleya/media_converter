@@ -39,7 +39,6 @@ If you want to make audio with black screen or image, it will do the trick.
 
 ..
 >>> from media_converter import MediaConverter
->>> MediaConverter([AudioTrack(None, codecs.AAC('256k', 2, 48000))], 'dst.m4a').convert(duration=10)
 >>> MediaConverter([VideoTrack(None, codecs.H264()),
                     AudioTrack('a.mp3', codecs.AAC())], 'b.mp4').convert()
 

@@ -1,3 +1,4 @@
+import os
 import subprocess
 from pyfileinfo import PyFileInfo
 from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
@@ -47,7 +48,7 @@ class MediaConverter:
         self._append_dst()
 
     def _init_command(self):
-        self._command = ['/usr/local/bin/ffmpeg', '-y']
+        self._command = [_which('ffmpeg'), '-y']
         self._infiles = []
 
     def _append_instreams(self):
@@ -98,7 +99,7 @@ class MediaConverter:
         track_index = 0
         for track in tracks:
             if track.language is not None:
-                self._command.extend([f'-metadata:s:{identifier}:{track_index}', track.language])
+                self._command.extend([f'-metadata:s:{identifier}:{track_index}', f'language={track.language}'])
 
             track_index += 1
 
@@ -180,3 +181,13 @@ class MediaConverter:
 
         for codec in default_codecs[self._dst.extension.lower()]:
             yield codec()
+
+
+def _which(name):
+    folders = os.environ.get('PATH', os.defpath).split(':')
+    for folder in folders:
+        file_path = os.path.join(folder, name)
+        if os.path.exists(file_path) and os.access(file_path, os.X_OK):
+            return file_path
+
+    return None

@@ -132,7 +132,10 @@ class AAC(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'aac', '-b:a', str(self.bitrate), '-ac', str(self.channels), '-ar', str(self.sampling_rate)]
+        return [f'-c:a:{track_index}', 'aac',
+                '-b:a', str(self.bitrate),
+                '-ac', str(self.channels),
+                '-ar', str(self.sampling_rate)]
 
 
 class AC3(AudioCodec):
@@ -140,7 +143,10 @@ class AC3(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'ac3', '-b:a', str(self.bitrate), '-ac', str(self.channels), '-ar', str(self.sampling_rate)]
+        return [f'-c:a:{track_index}', 'ac3',
+                '-b:a', str(self.bitrate),
+                '-ac', str(self.channels),
+                '-ar', str(self.sampling_rate)]
 
 
 class MP2(AudioCodec):
@@ -148,7 +154,10 @@ class MP2(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'mp2', '-b:a', str(self.bitrate), '-ac', str(self.channels), '-ar', str(self.sampling_rate)]
+        return [f'-c:a:{track_index}', 'mp2',
+                '-b:a', str(self.bitrate),
+                '-ac', str(self.channels),
+                '-ar', str(self.sampling_rate)]
 
 
 class SRT(SubtitleCodec):
