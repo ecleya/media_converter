@@ -11,9 +11,9 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
-               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
@@ -23,7 +23,7 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.wav',
-               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'a.m4a']
         mock_subprocess.assert_called_with(cmd)
 
@@ -34,8 +34,8 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
-               '-map', '0:v:0', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
-               '-map', '0:a:0', '-c:a', 'mp2', '-b:a', '256k', '-ac', '2', '-ar', '44100',
+               '-map', '0:v:0', '-c:v:0', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
+               '-map', '0:a:0', '-c:a:0', 'mp2', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
@@ -48,8 +48,8 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-filter_complex', '[0:v:0]scale=-2:480[vout0]',
-               '-map', '[vout0]', '-c:v', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
-               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
+               '-map', '[vout0]', '-c:v:0', 'mpeg2video', '-b:v', '3000k', '-aspect', '16:9', '-r', '23.97',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
@@ -60,8 +60,8 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
-               '-map', '0:v:0', '-c:v', 'libx265', '-preset', 'slow', '-x265-params', 'crf=18',
-               '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-map', '0:v:0', '-c:v:0', 'libx265', '-preset', 'slow', '-x265-params', 'crf=18',
+               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
@@ -71,7 +71,7 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-ar', '48000', '-ac', '1', '-f', 's16le', '-i', '/dev/zero',
-               '-map', '0:a:0', '-c:a', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '48000', '-t', '10',
+               '-map', '0:a:0', '-c:a:0', 'aac', '-b:a', '256k', '-ac', '2', '-ar', '48000', '-t', '10',
                '-threads', '0', 'b.m4a']
         mock_subprocess.assert_called_with(cmd)
 
@@ -83,9 +83,9 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-s', '640x360', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-r', '30', '-i', '/dev/zero',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
-               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '1:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               '-map', '1:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
                '-shortest',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
@@ -100,9 +100,9 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-i', 'a.png',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
-               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '1:a:0', '-c:a', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
+               '-map', '1:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
@@ -114,9 +114,9 @@ class TestMediaConverter(TestCase):
 
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
-               '-map', '0:v:0', '-c:v', 'copy',
-               '-map', '0:a:0', '-c:a', 'copy',
-               '-map', '0:s:0', '-c:s', 'copy',
+               '-map', '0:v:0', '-c:v:0', 'copy',
+               '-map', '0:a:0', '-c:a:0', 'copy',
+               '-map', '0:s:0', '-c:s:0', 'copy',
                '-threads', '0', 'b.mkv']
         mock_subprocess.assert_called_with(cmd)
 
@@ -129,9 +129,9 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mkv',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-ss', '5', '-i', 'a.mkv',
-               '-map', '0:v:0', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '1:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-map', '1:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
@@ -144,9 +144,9 @@ class TestMediaConverter(TestCase):
         cmd = ['/usr/local/bin/ffmpeg', '-y',
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-filter_complex', '[0:v:0]yadif[vout0];[vout0]scale=1920:-2[vout1]',
-               '-map', '[vout1]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '[vout1]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
@@ -163,9 +163,9 @@ class TestMediaConverter(TestCase):
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-i', 'a.png',
                '-filter_complex', '[0:v:0][1:v:0]overlay=0:0[vout0]',
-               '-map', '[vout0]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '[vout0]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
 
@@ -182,8 +182,8 @@ class TestMediaConverter(TestCase):
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-i', 'a.png',
                '-filter_complex', '[0:v:0][1:v:0]overlay=30:70[vout0]',
-               '-map', '[vout0]', '-c:v', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
+               '-map', '[vout0]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
+               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']
         mock_subprocess.assert_called_with(cmd)
