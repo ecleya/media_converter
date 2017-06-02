@@ -1,7 +1,7 @@
 import subprocess
 from pyfileinfo import PyFileInfo
 from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
-from media_converter.tracks import Track, AudioTrack, VideoTrack
+from media_converter.tracks import Track, AudioTrack, VideoTrack, SubtitleTrack
 
 
 class MediaConverter:
@@ -42,6 +42,7 @@ class MediaConverter:
         self._init_command()
         self._append_instreams()
         self._append_tracks()
+        self._append_defaults()
         self._append_time_options()
         self._append_dst()
 
@@ -61,7 +62,36 @@ class MediaConverter:
     def _append_tracks(self):
         for track in self.tracks:
             self._append_outstream_options_with_filter(track.outstream)
-            self._command.extend(track.codec.options_for_ffmpeg())
+            self._command.extend(track.codec.options_for_ffmpeg(self._get_track_index(track)))
+
+    def _get_track_index(self, target_track):
+        index = 0
+        for track in self._tracks:
+            if track == target_track:
+                break
+
+            if type(track) is type(target_track):
+                index += 1
+
+        return index
+
+    @property
+    def video_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, VideoTrack):
+                yield track
+
+    @property
+    def audio_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, AudioTrack):
+                yield track
+
+    @property
+    def subtitle_tracks(self):
+        for track in self.tracks:
+            if isinstance(track, SubtitleTrack):
+                yield track
 
     def _append_outstream_options_with_filter(self, outstream):
         idx = 0
