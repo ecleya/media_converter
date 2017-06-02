@@ -159,6 +159,14 @@ class SRT(SubtitleCodec):
         return [f'-c:s:{track_index}', 'srt']
 
 
+class TimedText(SubtitleCodec):
+    def __init__(self):
+        SubtitleCodec.__init__(self)
+
+    def options_for_ffmpeg(self, track_index):
+        return [f'-c:s:{track_index}', 'mov_text']
+
+
 class Copy(Codec):
     pass
 
