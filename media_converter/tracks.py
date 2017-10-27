@@ -1,5 +1,5 @@
-from media_converter.codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
-from media_converter.streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
+from .codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
+from .streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
 
 
 __all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']

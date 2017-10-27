@@ -1,4 +1,4 @@
-from media_converter.streams.instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
+from .instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
 
 
 class Outstream:
