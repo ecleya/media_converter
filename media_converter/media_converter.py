@@ -9,7 +9,7 @@ from .codecs import VideoCodec, AudioCodec, H264, AAC
 from .tracks import Track, AudioTrack, VideoTrack, SubtitleTrack
 
 
-class MediaConverter:
+class MediaConverter(object):
     def __init__(self, tracks, dst):
         if not isinstance(tracks, list):
             tracks = [tracks]

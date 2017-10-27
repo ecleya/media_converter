@@ -7,7 +7,7 @@ from .streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstrea
 __all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']
 
 
-class Track:
+class Track(object):
     def __init__(self, outstream, codec, default, language):
         self._outstream = outstream
         self._codec = codec

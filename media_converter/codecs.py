@@ -6,7 +6,7 @@ __all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
            'Copy']
 
 
-class Codec:
+class Codec(object):
     def is_video_codec(self):
         return isinstance(self, VideoCodec)
 

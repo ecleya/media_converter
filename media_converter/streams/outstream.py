@@ -3,7 +3,7 @@
 from .instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
 
 
-class Outstream:
+class Outstream(object):
     def __init__(self, instream):
         self._instreams = [instream]
         self._filters = []
