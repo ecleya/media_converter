@@ -1,0 +1,71 @@
+version: 2
+jobs:
+  test-python3.3:
+    docker:
+      - image: circleci/python:3.3
+    environment:
+      LC_ALL: "C"
+    steps:
+      - checkout
+      - run: sudo apt-get install mediainfo
+      - run: sudo pip install --upgrade pip
+      - run: sudo pip install -e .[test]
+      - run: pytest
+      - run: flake8
+  test-python3.4:
+    docker:
+      - image: circleci/python:3.4
+    environment:
+      LC_ALL: "C"
+    steps:
+      - checkout
+      - run: sudo apt-get install mediainfo
+      - run: sudo pip install --upgrade pip
+      - run: sudo pip install -e .[test]
+      - run: pytest
+      - run: flake8
+  test-python3.5:
+    docker:
+      - image: circleci/python:3.5
+    environment:
+      LC_ALL: "C"
+    steps:
+      - checkout
+      - run: sudo apt-get install mediainfo
+      - run: sudo pip install --upgrade pip
+      - run: sudo pip install -e .[test]
+      - run: pytest
+      - run: flake8
+  test-python3.6:
+    docker:
+      - image: circleci/python:3.6
+    environment:
+      LC_ALL: "C"
+    steps:
+      - checkout
+      - run: sudo apt-get install mediainfo
+      - run: sudo pip install --upgrade pip
+      - run: sudo pip install -e .[test]
+      - run: pytest
+      - run: flake8
+  test-python2.7:
+    docker:
+      - image: circleci/python:2.7
+    environment:
+      LC_ALL: "C"
+    steps:
+      - checkout
+      - run: sudo apt-get install mediainfo
+      - run: sudo pip install --upgrade pip
+      - run: sudo pip install -e .[test]
+      - run: pytest
+      - run: flake8
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test-python3.3
+      - test-python3.4
+      - test-python3.5
+      - test-python3.6
+      - test-python2.7
