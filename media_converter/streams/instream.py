@@ -110,7 +110,7 @@ class BlackVideoInstream(VideoInstream):
         return True
 
     def as_ffmpeg_instream(self):
-        options = ['-s', f'{self._width}x{self._height}', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+        options = ['-s', '{}x{}'.format(self._width, self._height), '-f', 'rawvideo', '-pix_fmt', 'rgb24',
                    '-r', str(self._frame_rate)]
         if self._start_at is not None:
             options += ['-ss', str(self.duration)]
