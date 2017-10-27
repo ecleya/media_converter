@@ -68,7 +68,7 @@ class ImageSequenceInstream(VideoInstream):
     def is_valid(file_path):
         try:
             return file_path != file_path % 1
-        except:
+        except:  # noqa: E722
             return False
 
     def as_ffmpeg_instream(self):
