@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
 
 

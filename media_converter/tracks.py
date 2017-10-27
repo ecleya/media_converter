@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
 from .streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
 
