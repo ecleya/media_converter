@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 import os
 import subprocess
 
 from pyfileinfo import PyFileInfo
 
-from .codecs import VideoCodec, AudioCodec, H264, AAC
-from .tracks import Track, AudioTrack, VideoTrack, SubtitleTrack
+from media_converter.codecs import VideoCodec
+from media_converter.codecs import AudioCodec
+from media_converter.codecs import H264
+from media_converter.codecs import AAC
+from media_converter.tracks import Track
+from media_converter.tracks import AudioTrack
+from media_converter.tracks import VideoTrack
+from media_converter.tracks import SubtitleTrack
 
 
 class MediaConverter(object):

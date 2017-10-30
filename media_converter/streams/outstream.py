@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
+from __future__ import absolute_import
+
+from media_converter.streams.instream import Instream
+from media_converter.streams.instream import VideoInstream
+from media_converter.streams.instream import AudioInstream
+from media_converter.streams.instream import SubtitleInstream
 
 
 class Outstream(object):

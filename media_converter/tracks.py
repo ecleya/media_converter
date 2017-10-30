@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from .codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
-from .streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
+from __future__ import absolute_import
+
+from media_converter.codecs import Copy
+from media_converter.codecs import VideoCopy
+from media_converter.codecs import AudioCopy
+from media_converter.codecs import SubtitleCopy
+from media_converter.streams import Outstream
+from media_converter.streams import VideoOutstream
+from media_converter.streams import AudioOutstream
+from media_converter.streams import SubtitleOutstream
 
 
 __all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']

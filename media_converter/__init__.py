@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .media_converter import MediaConverter
+from __future__ import absolute_import
+
+from media_converter.media_converter import MediaConverter
 
 
 __all__ = ['MediaConverter']
