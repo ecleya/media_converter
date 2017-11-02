@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from pyfileinfo import PyFileInfo
 
 
-class Instream:
+class Instream(object):
     def __init__(self, file_path, track_type, track_index, start_at=None):
         self._file_path = file_path
         self._track_type = track_type
@@ -68,7 +70,7 @@ class ImageSequenceInstream(VideoInstream):
     def is_valid(file_path):
         try:
             return file_path != file_path % 1
-        except:
+        except:  # noqa: E722
             return False
 
     def as_ffmpeg_instream(self):
@@ -110,7 +112,7 @@ class BlackVideoInstream(VideoInstream):
         return True
 
     def as_ffmpeg_instream(self):
-        options = ['-s', f'{self._width}x{self._height}', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+        options = ['-s', '{}x{}'.format(self._width, self._height), '-f', 'rawvideo', '-pix_fmt', 'rgb24',
                    '-r', str(self._frame_rate)]
         if self._start_at is not None:
             options += ['-ss', str(self.duration)]

@@ -1,4 +1,8 @@
-from unittest import TestCase, mock
+# -*- coding: utf-8 -*-
+
+import mock
+from unittest import TestCase
+
 from media_converter import MediaConverter, codecs
 from media_converter.tracks import VideoTrack, AudioTrack, SubtitleTrack
 from media_converter.streams import VideoOutstream, AudioInstream

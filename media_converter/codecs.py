@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 __all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
            'AudioCodec', 'MP2', 'AAC', 'AC3', 'MP2',
            'SubtitleCodec', 'SRT', 'TimedText',
            'Copy']
 
 
-class Codec:
+class Codec(object):
     def is_video_codec(self):
         return isinstance(self, VideoCodec)
 
@@ -74,7 +76,7 @@ class H264(VideoCodec):
         self._level = level
 
     def options_for_ffmpeg(self, track_index):
-        options = [f'-c:v:{track_index}', 'h264']
+        options = ['-c:v:{}'.format(track_index), 'h264']
         options.extend(['-crf', self._constant_rate_factor] if self._bitrate is None else ['-b:v', self._bitrate])
         options.extend(['-pix_fmt', self._pixel_format, '-profile:v', self._profile, '-level', self._level])
 
@@ -94,8 +96,8 @@ class H265(VideoCodec):
         self._constant_rate_factor = str(constant_rate_factor)
 
     def options_for_ffmpeg(self, track_index):
-        options = [f'-c:v:{track_index}', 'libx265']
-        options.extend(['-preset', 'slow', '-x265-params', f'crf={self._constant_rate_factor}'])
+        options = ['-c:v:{}'.format(track_index), 'libx265']
+        options.extend(['-preset', 'slow', '-x265-params', 'crf={}'.format(self._constant_rate_factor)])
 
         if self._aspect_ratio is not None:
             options.extend(['-aspect', str(self.aspect_ratio)])
@@ -110,7 +112,7 @@ class MPEG2(VideoCodec):
         VideoCodec.__init__(self, bitrate, aspect_ratio, frame_rate)
 
     def options_for_ffmpeg(self, track_index):
-        options = [f'-c:v:{track_index}', 'mpeg2video', '-b:v', str(self.bitrate)]
+        options = ['-c:v:{}'.format(track_index), 'mpeg2video', '-b:v', str(self.bitrate)]
         if self._aspect_ratio is not None:
             options.extend(['-aspect', str(self.aspect_ratio)])
         if self._frame_rate is not None:
@@ -132,7 +134,7 @@ class AAC(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'aac',
+        return ['-c:a:{}'.format(track_index), 'aac',
                 '-b:a', str(self.bitrate),
                 '-ac', str(self.channels),
                 '-ar', str(self.sampling_rate)]
@@ -143,7 +145,7 @@ class AC3(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'ac3',
+        return ['-c:a:{}'.format(track_index), 'ac3',
                 '-b:a', str(self.bitrate),
                 '-ac', str(self.channels),
                 '-ar', str(self.sampling_rate)]
@@ -154,7 +156,7 @@ class MP2(AudioCodec):
         AudioCodec.__init__(self, bitrate, channels, sampling_rate)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'mp2',
+        return ['-c:a:{}'.format(track_index), 'mp2',
                 '-b:a', str(self.bitrate),
                 '-ac', str(self.channels),
                 '-ar', str(self.sampling_rate)]
@@ -165,7 +167,7 @@ class SRT(SubtitleCodec):
         SubtitleCodec.__init__(self)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:s:{track_index}', 'srt']
+        return ['-c:s:{}'.format(track_index), 'srt']
 
 
 class TimedText(SubtitleCodec):
@@ -173,7 +175,7 @@ class TimedText(SubtitleCodec):
         SubtitleCodec.__init__(self)
 
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:s:{track_index}', 'mov_text']
+        return ['-c:s:{}'.format(track_index), 'mov_text']
 
 
 class Copy(Codec):
@@ -182,14 +184,14 @@ class Copy(Codec):
 
 class VideoCopy(VideoCodec):
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:v:{track_index}', 'copy']
+        return ['-c:v:{}'.format(track_index), 'copy']
 
 
 class AudioCopy(AudioCodec):
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:a:{track_index}', 'copy']
+        return ['-c:a:{}'.format(track_index), 'copy']
 
 
 class SubtitleCopy(SubtitleCodec):
     def options_for_ffmpeg(self, track_index):
-        return [f'-c:s:{track_index}', 'copy']
+        return ['-c:s:{}'.format(track_index), 'copy']

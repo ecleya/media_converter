@@ -1,11 +1,23 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import os
 import subprocess
+
 from pyfileinfo import PyFileInfo
-from media_converter.codecs import VideoCodec, AudioCodec, H264, AAC
-from media_converter.tracks import Track, AudioTrack, VideoTrack, SubtitleTrack
+
+from media_converter.codecs import VideoCodec
+from media_converter.codecs import AudioCodec
+from media_converter.codecs import H264
+from media_converter.codecs import AAC
+from media_converter.tracks import Track
+from media_converter.tracks import AudioTrack
+from media_converter.tracks import VideoTrack
+from media_converter.tracks import SubtitleTrack
 
 
-class MediaConverter:
+class MediaConverter(object):
     def __init__(self, tracks, dst):
         if not isinstance(tracks, list):
             tracks = [tracks]
@@ -90,7 +102,7 @@ class MediaConverter:
         is_default = not has_default_track
         track_index = 0
         for track in tracks:
-            self._command.extend([f'-disposition:{identifier}:{track_index}',
+            self._command.extend(['-disposition:{}:{}'.format(identifier, track_index),
                                   'default' if is_default or track.default else '0'])
             is_default = False
             track_index += 1
@@ -99,7 +111,9 @@ class MediaConverter:
         track_index = 0
         for track in tracks:
             if track.language is not None:
-                self._command.extend([f'-metadata:s:{identifier}:{track_index}', f'language={track.language}'])
+                self._command.extend(
+                    ['-metadata:s:{}:{}'.format(identifier, track_index), 'language={}'.format(track.language)]
+                )
 
             track_index += 1
 
@@ -125,23 +139,23 @@ class MediaConverter:
         idx = 0
         instream = outstream.instreams[0]
         infile_index = self._infiles.index(instream.as_ffmpeg_instream())
-        instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
-        outstream_id = f'[vout{idx}]'
+        instream_id = '[{}:{}:{}]'.format(infile_index, instream.track_type, instream.track_index)
+        outstream_id = '[vout{}]'.format(idx)
         filters = []
 
         for instream, filter_option in outstream.filters:
             if instream is None:
-                filters.append(f'{instream_id}{filter_option}{outstream_id}')
+                filters.append('{}{}{}'.format(instream_id, filter_option, outstream_id))
             else:
                 infile_index = self._infiles.index(instream.as_ffmpeg_instream())
-                additional_instream_id = f'[{infile_index}:{instream.track_type}:{instream.track_index}]'
-                filters.append(f'{instream_id}{additional_instream_id}{filter_option}{outstream_id}')
+                additional_instream_id = '[{}:{}:{}]'.format(infile_index, instream.track_type, instream.track_index)
+                filters.append('{}{}{}{}'.format(instream_id, additional_instream_id, filter_option, outstream_id))
             instream_id = outstream_id
             idx += 1
-            outstream_id = f'[vout{idx}]'
+            outstream_id = '[vout{}]'.format(idx)
 
         if len(filters) == 0:
-            self._command.extend(['-map', f'{infile_index}:{instream.track_type}:{instream.track_index}'])
+            self._command.extend(['-map', '{}:{}:{}'.format(infile_index, instream.track_type, instream.track_index)])
         else:
             self._command.extend(['-filter_complex', ';'.join(filters), '-map', instream_id])
 

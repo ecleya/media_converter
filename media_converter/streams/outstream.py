@@ -1,7 +1,14 @@
-from media_converter.streams.instream import Instream, VideoInstream, AudioInstream, SubtitleInstream
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
+from media_converter.streams.instream import Instream
+from media_converter.streams.instream import VideoInstream
+from media_converter.streams.instream import AudioInstream
+from media_converter.streams.instream import SubtitleInstream
 
 
-class Outstream:
+class Outstream(object):
     def __init__(self, instream):
         self._instreams = [instream]
         self._filters = []
@@ -27,7 +34,7 @@ class VideoOutstream(Outstream):
         if height is None:
             height = -2
 
-        self._filters.append((None, f'scale={width}:{height}'))
+        self._filters.append((None, 'scale={}:{}'.format(width, height)))
         return self
 
     def deinterlace(self):
@@ -43,11 +50,11 @@ class VideoOutstream(Outstream):
         instream = instream if isinstance(instream, Instream) else VideoInstream.factory(instream)
         self._instreams.append(instream)
 
-        self._filters.append((instream, f'overlay={x}:{y}'))
+        self._filters.append((instream, 'overlay={}:{}'.format(x, y)))
         return self
 
     def crop(self, area):
-        self._filters.append((None, f'crop={area}'))
+        self._filters.append((None, 'crop={}'.format(area)))
         return self
 
 

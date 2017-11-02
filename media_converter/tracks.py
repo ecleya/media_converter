@@ -1,11 +1,21 @@
-from media_converter.codecs import Copy, VideoCopy, AudioCopy, SubtitleCopy
-from media_converter.streams import VideoOutstream, AudioOutstream, SubtitleOutstream, Outstream
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
+from media_converter.codecs import Copy
+from media_converter.codecs import VideoCopy
+from media_converter.codecs import AudioCopy
+from media_converter.codecs import SubtitleCopy
+from media_converter.streams import Outstream
+from media_converter.streams import VideoOutstream
+from media_converter.streams import AudioOutstream
+from media_converter.streams import SubtitleOutstream
 
 
 __all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']
 
 
-class Track:
+class Track(object):
     def __init__(self, outstream, codec, default, language):
         self._outstream = outstream
         self._codec = codec
