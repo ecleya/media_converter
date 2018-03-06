@@ -90,19 +90,34 @@ class H264(VideoCodec):
 
 class H265(VideoCodec):
     def __init__(self, constant_rate_factor=23, preset='medium',
+                 pixel_format='yuv420p', profile='main', level='4',
                  aspect_ratio=None, frame_rate=None):
         VideoCodec.__init__(self, None, aspect_ratio, frame_rate)
 
         self._constant_rate_factor = str(constant_rate_factor)
+        self._preset = preset
+        self._pixel_format = pixel_format
+        self._profile = profile
+        self._level = level
 
     def options_for_ffmpeg(self, track_index):
         options = ['-c:v:{}'.format(track_index), 'libx265']
-        options.extend(['-preset', 'slow', '-x265-params', 'crf={}'.format(self._constant_rate_factor)])
+        options.extend([
+            '-preset', self._preset,
+            '-pix_fmt', self._pixel_format,
+        ])
 
         if self._aspect_ratio is not None:
             options.extend(['-aspect', str(self.aspect_ratio)])
         if self._frame_rate is not None:
             options.extend(['-r', str(self.frame_rate)])
+
+        x265_params = [
+            'crf={}'.format(self._constant_rate_factor),
+            'profile={}'.format(self._profile),
+            'level={}'.format(self._level),
+        ]
+        options.extend(['-x265-params', ':'.join(x265_params)])
 
         return options
 
