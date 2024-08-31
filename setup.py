@@ -1,24 +1,8 @@
-# -*- coding: utf-8 -*-
-
-import os.path
-import warnings
-
 from setuptools import setup, find_packages
-
-
-def version():
-    try:
-        root = os.path.abspath(os.path.dirname(__file__))
-        with open(os.path.join(root, '.version')) as f:
-            return f.read().strip()
-    except IOError:
-        warnings.warn("Couldn't found .version file", RuntimeWarning)
-        return ''
 
 
 REQUIREMENTS = [
     'chardet',
-    'pyfileinfo',
     'future',
 ]
 
@@ -34,19 +18,19 @@ EXTRAS_REQUIRE = {
 
 setup(
     name='media_converter',
-    version=version(),
+    version='1.2.0',
     classifiers=[
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
     ],
     author='Kiheon Choi',
-    author_email='ecleya' '@' 'smartstudy.co.kr',
-    maintainer='DevOps Team, SMARTSTUDY',
-    maintainer_email='d9@smartstudy.co.kr',
-    url='https://github.com/smartstudy/media_converter',
+    author_email='ecleya' '@' 'gmail.com',
+    maintainer='Kiheon Choi',
+    maintainer_email='ecleya@gmail.com',
+    url='https://github.com/ecleya/media_converter',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
