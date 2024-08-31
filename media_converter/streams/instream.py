@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from pyfileinfo import PyFileInfo
-
-
 class Instream(object):
     def __init__(self, file_path, track_type, track_index, start_at=None):
         self._file_path = file_path
@@ -49,9 +44,6 @@ class VideoInstream(Instream):
         if ImageSequenceInstream.is_valid(file_path):
             return ImageSequenceInstream(file_path)
 
-        if ImageInstream.is_valid(file_path):
-            return ImageInstream(file_path)
-
         return VideoInstream(file_path, 0)
 
 
@@ -77,18 +69,6 @@ class ImageSequenceInstream(VideoInstream):
         options = [] if self._start_at is None else ['-ss', str(self.start_at)]
 
         return options + ['-r', str(self._frame_rate), '-vsync', '1', '-f', 'image2', '-i', self._image_seq_pattern]
-
-
-class ImageInstream(VideoInstream):
-    def __init__(self, file_path):
-        VideoInstream.__init__(self, file_path, 0)
-
-    @staticmethod
-    def is_valid(file_path):
-        return PyFileInfo(file_path).is_image()
-
-    def as_ffmpeg_instream(self):
-        return ['-i', self._file_path]
 
 
 class BlackVideoInstream(VideoInstream):

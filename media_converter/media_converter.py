@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
 import os
 import subprocess
-
-from pyfileinfo import PyFileInfo
+from pathlib import Path
 
 from media_converter.codecs import VideoCodec
 from media_converter.codecs import AudioCodec
@@ -23,7 +18,7 @@ class MediaConverter(object):
             tracks = [tracks]
 
         self._tracks = tracks
-        self._dst = PyFileInfo(dst)
+        self._dst = Path(dst)
         self._command = None
         self._infiles = None
         self._start = None
@@ -183,7 +178,7 @@ class MediaConverter(object):
         return False
 
     def _append_dst(self):
-        self._command.extend(['-threads', '0', self._dst.path])
+        self._command.extend(['-threads', '0', str(self._dst)])
 
     def _get_default_codecs(self):
         default_codecs = {
@@ -193,7 +188,7 @@ class MediaConverter(object):
             '.m4a': [AAC],
         }
 
-        for codec in default_codecs[self._dst.extension.lower()]:
+        for codec in default_codecs[self._dst.suffix.lower()]:
             yield codec()
 
 

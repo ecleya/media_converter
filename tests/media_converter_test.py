@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-import mock
 from unittest import TestCase
+from unittest import mock
 
 from media_converter import MediaConverter, codecs
 from media_converter.tracks import VideoTrack, AudioTrack, SubtitleTrack
@@ -103,22 +101,6 @@ class TestMediaConverter(TestCase):
         mock_subprocess.assert_called_with(cmd)
 
     @mock.patch('subprocess.call')
-    @mock.patch('media_converter.streams.instream.ImageInstream.is_valid')
-    def test_image_video_with_audio(self, mock_valid, mock_subprocess):
-        mock_valid.return_value = True
-        MediaConverter([VideoTrack('a.png', codecs.H264()),
-                        AudioTrack('a.mp3', codecs.AAC())], 'b.mp4').convert()
-
-        cmd = ['/somewhere/ffmpeg', '-y',
-               '-i', 'a.png',
-               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp3',
-               '-map', '0:v:0', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
-               '-profile:v', 'high', '-level', '3.1',
-               '-map', '1:a:0', '-c:a:0', 'aac', '-b:a', '192k', '-ac', '2', '-ar', '44100',
-               '-threads', '0', 'b.mp4']
-        mock_subprocess.assert_called_with(cmd)
-
-    @mock.patch('subprocess.call')
     def test_copy(self, mock_subprocess):
         MediaConverter([VideoTrack('a.mkv', codecs.Copy()),
                         AudioTrack('a.mkv', codecs.Copy()),
@@ -157,44 +139,6 @@ class TestMediaConverter(TestCase):
                '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
                '-filter_complex', '[0:v:0]yadif[vout0];[vout0]scale=1920:-2[vout1]',
                '-map', '[vout1]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
-               '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               '-threads', '0', 'b.mp4']
-        mock_subprocess.assert_called_with(cmd)
-
-    @mock.patch('subprocess.call')
-    @mock.patch('media_converter.streams.instream.ImageInstream.is_valid')
-    def test_overlay_filter(self, mock_valid, mock_subprocess):
-        mock_valid.side_effect = lambda x: x == 'a.png'
-
-        vos = VideoOutstream('a.mp4').overlay('a.png')
-        MediaConverter([VideoTrack(vos, codecs.H264()),
-                        AudioTrack('a.mp4', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
-
-        cmd = ['/somewhere/ffmpeg', '-y',
-               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
-               '-i', 'a.png',
-               '-filter_complex', '[0:v:0][1:v:0]overlay=0:0[vout0]',
-               '-map', '[vout0]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
-               '-profile:v', 'high', '-level', '3.1',
-               '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
-               '-threads', '0', 'b.mp4']
-        mock_subprocess.assert_called_with(cmd)
-
-    @mock.patch('subprocess.call')
-    @mock.patch('media_converter.streams.instream.ImageInstream.is_valid')
-    def test_overlay_filter_with_xy_option(self, mock_valid, mock_subprocess):
-        mock_valid.side_effect = lambda x: x == 'a.png'
-
-        vos = VideoOutstream('a.mp4').overlay('a.png', 30, 70)
-        MediaConverter([VideoTrack(vos, codecs.H264()),
-                        AudioTrack('a.mp4', codecs.AC3('448k', 6, 48000))], 'b.mp4').convert()
-
-        cmd = ['/somewhere/ffmpeg', '-y',
-               '-analyzeduration', '2147483647', '-probesize', '2147483647', '-i', 'a.mp4',
-               '-i', 'a.png',
-               '-filter_complex', '[0:v:0][1:v:0]overlay=30:70[vout0]',
-               '-map', '[vout0]', '-c:v:0', 'h264', '-crf', '23', '-pix_fmt', 'yuv420p',
                '-profile:v', 'high', '-level', '3.1',
                '-map', '0:a:0', '-c:a:0', 'ac3', '-b:a', '448k', '-ac', '6', '-ar', '48000',
                '-threads', '0', 'b.mp4']

@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
 from media_converter.streams.instream import Instream
 from media_converter.streams.instream import VideoInstream
 from media_converter.streams.instream import AudioInstream
