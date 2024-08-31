@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 
 from media_converter.codecs import Copy
@@ -15,7 +13,7 @@ from media_converter.streams import SubtitleOutstream
 __all__ = ['Track', 'VideoTrack', 'AudioTrack', 'SubtitleTrack']
 
 
-class Track(object):
+class Track:
     def __init__(self, outstream, codec, default, language):
         self._outstream = outstream
         self._codec = codec

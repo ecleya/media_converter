@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 __all__ = ['VideoCodec', 'H264', 'H265', 'MPEG2',
            'AudioCodec', 'MP2', 'AAC', 'AC3', 'MP2',
            'SubtitleCodec', 'SRT', 'TimedText',
            'Copy']
 
 
-class Codec(object):
+class Codec:
     def is_video_codec(self):
         return isinstance(self, VideoCodec)
 

@@ -4,7 +4,7 @@ from media_converter.streams.instream import AudioInstream
 from media_converter.streams.instream import SubtitleInstream
 
 
-class Outstream(object):
+class Outstream:
     def __init__(self, instream):
         self._instreams = [instream]
         self._filters = []

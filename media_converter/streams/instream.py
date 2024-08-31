@@ -1,4 +1,4 @@
-class Instream(object):
+class Instream:
     def __init__(self, file_path, track_type, track_index, start_at=None):
         self._file_path = file_path
         self._track_type = track_type

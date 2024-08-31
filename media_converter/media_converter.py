@@ -12,7 +12,7 @@ from media_converter.tracks import VideoTrack
 from media_converter.tracks import SubtitleTrack
 
 
-class MediaConverter(object):
+class MediaConverter:
     def __init__(self, tracks, dst):
         if not isinstance(tracks, list):
             tracks = [tracks]
